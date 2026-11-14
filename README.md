@@ -66,3 +66,20 @@ python -m scripts.run_all Barnard   # chaîne complète sur données réelles (o
 `measure` (ajustement global, ponts entre groupes) → `video` (MP4 + frise).
 
 Données : SPHEREx via IRSA (Caltech/IPAC). Code des tutoriels IRSA (BSD-3) utilisé comme référence.
+
+## Frontend + backend ensemble (branche `integration`)
+
+Le frontend est dans `frontend/` (`index.html`, `css.css`, `main.js`) et le backend le sert lui-même :
+
+```powershell
+cd backend
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Puis ouvrir **http://localhost:8000/** (redirige vers `/app/`). L'API reste sur `/api/...` et `/docs`.
+
+Le lien se fait dans `frontend/observationsApi.js` : `main.js` appelle
+`window.ObservationsApi.fetchObservations({ ra, dec, fov, band, target })`, l'adaptateur appelle
+`GET /api/motion` et renvoie `{ frames: [...] }` (une image par date, dans l'ordre de la vidéo).
+Barnard et WISE 0855 sont envoyés par leur **nom** (le backend corrige leur mouvement propre).
+Le premier calcul d'une cible prend plusieurs minutes ; ensuite la réponse vient du cache.

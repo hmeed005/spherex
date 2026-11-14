@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -15,9 +17,16 @@ app.include_router(images.router)
 app.mount("/files", StaticFiles(directory=str(config.CACHE_DIR)), name="files")
 
 
+# Frontend (dossier ../frontend à la racine du dépôt) servi sous /app/ :
+# même adresse que l'API -> pas de problème de CORS ni d'IP à configurer.
+FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
+if FRONTEND_DIR.is_dir():
+    app.mount("/app", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
+
+
 @app.get("/", include_in_schema=False)
 def root():
-    return RedirectResponse("/docs")
+    return RedirectResponse("/app/" if FRONTEND_DIR.is_dir() else "/docs")
 
 
 @app.get("/player", include_in_schema=False)
