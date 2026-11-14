@@ -84,6 +84,22 @@
     const detector = bandToDetector(band);
     if (detector) params.set("detector", detector);
 
+    // Pas d'image de la cible précédente pendant le calcul
+    const img = document.getElementById("cutout-img");
+    if (img) img.removeAttribute("src");
+
+    // Le 1er calcul d'une cible prend plusieurs minutes : afficher le temps écoulé
+    const statusEl = document.getElementById("timeline-status");
+    const label = target?.shortName || target?.name || `RA ${ra}, Dec ${dec}`;
+    const t0 = Date.now();
+    const progress = setInterval(() => {
+      if (!statusEl || !statusEl.classList.contains("loading")) return;
+      const s = Math.round((Date.now() - t0) / 1000);
+      statusEl.textContent =
+        `Calcul SPHEREx en cours pour ${label}… ${s} s ` +
+        `(le premier calcul d'une cible peut prendre plusieurs minutes, ensuite c'est instantané)`;
+    }, 1000);
+
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
     let res;
@@ -94,6 +110,7 @@
       throw new Error(`Backend injoignable (${API_BASE}). Le serveur est-il lancé ?`);
     } finally {
       clearTimeout(timer);
+      clearInterval(progress);
     }
     if (!res.ok) {
       let detail = "";

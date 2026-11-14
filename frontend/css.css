@@ -1893,3 +1893,23 @@ body {
     transition-duration: 150ms !important;
   }
 }
+
+/* =========================================================
+   Lien backend : image réelle SPHEREx dans le panneau cutout
+   - pas d'icône « image cassée » tant qu'aucune image n'est chargée
+   - dès qu'une vraie image est là : affichée entière, pleine opacité,
+     et le dessin synthétique (fausses étoiles) du canvas est masqué
+   ========================================================= */
+.cutout-img-layer:not([src]) {
+  visibility: hidden;
+}
+
+.cutout-img-layer[src] {
+  opacity: 1;
+  object-fit: contain;
+  background: #000;
+}
+
+.cutout-media-stage:has(.cutout-img-layer[src]) #cutout-canvas {
+  display: none;
+}
