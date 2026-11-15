@@ -60,6 +60,9 @@ class VideoAssets(BaseModel):
     #   u = (x + 0.5) * px_scale ;  v = height - (y + 0.5) * px_scale   (nord en haut)
     grid_size_px: Optional[int] = None
     px_scale: Optional[float] = None
+    # marge retirée de chaque bord de la vidéo propre (coins vides de la découpe tournée) :
+    #   u = (x + 0.5) * px_scale - crop_px ;  v = grid_size_px * px_scale - crop_px - (y + 0.5) * px_scale
+    crop_px: int = 0
     timeline: list[TimelineEntry]
 
 

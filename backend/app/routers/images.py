@@ -196,7 +196,7 @@ async def get_timeline(
         gif_url=_url(aligned.gif), sheet_url=_url(aligned.sheet))
 
 
-RESULT_VERSION = "motion-v1"   # changer pour invalider les résultats en cache
+RESULT_VERSION = "motion-v2"   # changer pour invalider les résultats en cache
 
 
 class MotionResponse(ScreenResult.__base__):
@@ -266,6 +266,10 @@ async def get_motion(
         sequence_video_urls=[sq.video.mp4 if sq.video else None for sq in plan.sequences],
         side_by_side_urls=[_url(it.get("png")) for it in plan.side_by_side if it.get("png")],
         positions_plot_url=_url(plot))
-    cached.parent.mkdir(parents=True, exist_ok=True)
-    cached.write_text(response.model_dump_json(), encoding="utf-8")
+    # un résultat vide (IRSA en panne, aucune image exploitable) n'est pas mis en cache :
+    # la prochaine demande réessaiera au lieu de renvoyer « aucune image » pour toujours
+    has_images = any(sq.video and sq.video.timeline for sq in plan.sequences)
+    if has_images:
+        cached.parent.mkdir(parents=True, exist_ok=True)
+        cached.write_text(response.model_dump_json(), encoding="utf-8")
     return response

@@ -189,3 +189,25 @@ def test_calibrated_uncertainties_remove_false_disagreements():
     bad_raw = sum(not c.agree for c in raw.comparisons)
     bad_cal = sum(not c.agree for c in cal.comparisons)
     assert bad_cal < bad_raw and bad_cal <= 0.15 * len(cal.comparisons)
+
+
+def test_clean_crop_removes_empty_corners_of_rotated_cutout():
+    """Découpe tournée de 30° dans une grille nord en haut : la vidéo propre ne garde
+    que le carré centré entièrement couvert (pas de coins vides), jamais moins que n/√2."""
+    import numpy as np
+    from app.core.measure import clean_crop
+
+    N = 300
+    yy, xx = np.indices((N, N)) - (N - 1) / 2
+    full = np.ones((N, N))
+    assert clean_crop([full, full]) == 0                       # rien à rogner
+
+    th = np.radians(30)
+    u = xx * np.cos(th) + yy * np.sin(th)
+    v = -xx * np.sin(th) + yy * np.cos(th)
+    rot = np.where((np.abs(u) <= N / 2) & (np.abs(v) <= N / 2), 1.0, np.nan)
+    c0 = clean_crop([full, rot])
+    sub = rot[c0:N - c0, c0:N - c0]
+    assert np.isfinite(sub).all()                              # plus de coins vides
+    assert c0 <= round(N / 2 * (1 - 1 / np.sqrt(2)))           # au pire n/√2
+    assert not np.isfinite(rot[c0 - 1:N - c0 + 1, c0 - 1:N - c0 + 1]).all()  # carré maximal

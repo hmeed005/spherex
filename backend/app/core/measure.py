@@ -499,6 +499,24 @@ def plan_display(measures: list[PositionMeasure], frames_by_id: dict,
 
 
 # ----------------------------------------------------------------- rendu
+def clean_crop(shown: list[np.ndarray]) -> int:
+    """Marge (en pixels vidéo) à retirer de chaque bord pour la vidéo propre.
+
+    La grille est orientée nord en haut, mais les détecteurs de SPHEREx sont tournés :
+    la découpe IRSA apparaît comme un carré incliné, avec des coins vides (NaN).
+    On garde le plus grand carré centré (sur la cible) valide dans TOUTES les images.
+    Un carré tourné de n'importe quel angle contient toujours le carré centré de côté
+    n/sqrt(2) : on ne rogne donc jamais plus que cela (le reste éventuel reste noir).
+    """
+    N = shown[0].shape[0]
+    valid = np.all([np.isfinite(img) for img in shown], axis=0)
+    c_max = int(round(N / 2 * (1 - 1 / np.sqrt(2))))
+    for c0 in range(0, c_max + 1):
+        if valid[c0:N - c0, c0:N - c0].all():
+            return c0
+    return c_max
+
+
 def _render_sequence(target, seq: DisplaySequence, motion: MotionResult, frames_by_id: dict,
                      cache: dict, out_dir: Path, tag: str) -> None:
     import matplotlib
@@ -627,14 +645,19 @@ def _render_sequence(target, seq: DisplaySequence, motion: MotionResult, frames_
     if rgb:
         # vidéo PROPRE : uniquement l'image du ciel (même contraste pour toutes les dates)
         up = shown[0].shape[0] / n
+        c0 = clean_crop(shown)                           # pas de coins vides (découpe tournée)
+        N = shown[0].shape[0]
         clean = []
         for img in shown:
-            rgba = cmap(norm(np.flipud(img)))            # nord en haut
-            clean.append((np.nan_to_num(rgba[..., :3], nan=0.12) * 255).astype(np.uint8))
+            sub = np.flipud(img)[c0:N - c0, c0:N - c0]   # nord en haut, carré centré sur la cible
+            rgba = cmap(norm(sub))
+            ok = np.isfinite(sub)[..., None]
+            clean.append((np.where(ok, rgba[..., :3], 0.0) * 255).astype(np.uint8))
         seq.video = build_video(clean, entries, out_dir / tag, loop_back=len(clean) > 1,
                                 make_gif=MAKE_GIF)
         seq.video.grid_size_px = n
         seq.video.px_scale = round(float(up), 4)
+        seq.video.crop_px = int(c0)
         # variante avec repères dessinés (positions, trajectoire), toujours sans texte
         mk = build_video(rgb, entries, out_dir / f"{tag}_reperes", loop_back=len(rgb) > 1,
                          make_gif=False, make_vtt=False)

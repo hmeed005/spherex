@@ -1913,3 +1913,18 @@ body {
 .cutout-media-stage:has(.cutout-img-layer[src]) #cutout-canvas {
   display: none;
 }
+
+/* Vidéo MP4 : panneau carré pour voir l'image du ciel en entier */
+.cutout-media-stage:has(video.cutout-img-layer[src]) {
+  height: auto;
+  aspect-ratio: 1 / 1;
+}
+
+/* Repère de la cible par-dessus la vidéo */
+#cutout-marker-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}

@@ -34,11 +34,17 @@ DEMO_TARGETS = {
                            pmra=-8118.0, pmdec=673.0),
     "nep": dict(label="Pôle nord écliptique", ra=270.0, dec=66.560708,
                 pmra=0.0, pmdec=0.0),
+    # ε Indi Ba/Bb (naines brunes) : 2MASS J22041052-5646577, à ~6.7' de ε Indi A.
+    # Mouvement propre : +3981.977 / -2466.832 mas/an.
+    "eps indi b": dict(label="ε Indi Ba/Bb", ra=331.043833, dec=-56.782694,
+                       pmra=3981.977, pmdec=-2466.832),
 }
 ALIASES = {
     "barnard's star": "barnard", "barnards star": "barnard", "etoile de barnard": "barnard",
     "wise 0855": "wise 0855-0714", "wise0855": "wise 0855-0714",
     "north ecliptic pole": "nep", "pole nord ecliptique": "nep",
+    "epsilon indi b": "eps indi b", "eps ind b": "eps indi b", "epsilon indi ba / bb": "eps indi b",
+    "eps indi ba": "eps indi b", "epsilon indi ba": "eps indi b",
 }
 
 

@@ -360,10 +360,13 @@
           <!-- Backend WCS-Aligned Sky Cutout Viewer -->
           <div id="cutout-viewer-box" class="cutout-box">
             <div class="cutout-header">
-              <span>WCS SKY CUTOUT (.webp / .png)</span>
+              <span>WCS SKY CUTOUT (.mp4)</span>
               <div class="cutout-btn-group">
                 <button id="diff-mode-btn" type="button" class="diff-toggle" title="Subtract Epoch 1 to reveal motion dipole">
                   Diff: OFF
+                </button>
+                <button id="marker-toggle-btn" type="button" class="diff-toggle active" title="Afficher / masquer le repère de la cible">
+                  ◎ Cible: ON
                 </button>
                 <button id="cutout-fullscreen-btn" type="button" class="diff-toggle" title="Toggle Full-Screen Cutout View">
                   ⛶ Full
@@ -376,6 +379,10 @@
             </div>
             <div class="cutout-media-stage">
               <img id="cutout-img" class="cutout-img-layer" alt="Backend WCS-aligned SPHEREx sky cutout" />
+              <!-- Vidéo MP4 du backend (ciel seul) ; date, λ, groupe dans la frise en bas -->
+              <video id="cutout-video" class="cutout-img-layer" muted playsinline preload="auto"></video>
+              <!-- Repère de la cible, dessiné par-dessus la vidéo (la vidéo reste le ciel brut) -->
+              <canvas id="cutout-marker-canvas" aria-hidden="true"></canvas>
               <canvas id="cutout-canvas" width="290" height="150"></canvas>
             </div>
             <div class="cutout-legend">

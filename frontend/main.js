@@ -614,6 +614,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const cutoutEpochLabel = document.getElementById("cutout-epoch-label");
   const cutoutFovLabel = document.getElementById("cutout-fov-label");
   const cutoutImg = document.getElementById("cutout-img");
+  const cutoutVideo = document.getElementById("cutout-video"); // vidéo MP4 du backend
+  const markerCanvas = document.getElementById("cutout-marker-canvas"); // repère de la cible
+  const markerToggleBtn = document.getElementById("marker-toggle-btn");
   const cutoutCanvas = document.getElementById("cutout-canvas");
   const cutoutCtx = cutoutCanvas.getContext("2d");
   const spectrumCanvas = document.getElementById("spectrum-canvas");
@@ -1902,6 +1905,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================
   // 11. Select Dwarf, 3D Flight (2.15s), Inspector & Overview
   // =========================================================
+  let observationsRequestNo = 0;
+
   async function selectAndZoomToTarget(target) {
     selectedTarget = target;
     targetLockStartTime = performance.now();
@@ -1996,6 +2001,9 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     // Fetch multi-epoch cutouts via F1's single API adapter (observationsApi.js)
+    // N° de requête : seule la DERNIÈRE demande peut afficher son résultat
+    // (sinon une réponse lente d'une demande précédente remplace la vidéo en cours).
+    const requestNo = ++observationsRequestNo;
     try {
       if (typeof window.ObservationsApi?.fetchObservations !== "function") {
         throw new Error("Observation API adapter is not configured.");
@@ -2009,16 +2017,18 @@ document.addEventListener("DOMContentLoaded", () => {
         target,
       });
 
-      if (selectedTarget?.id !== target.id) return;
+      if (requestNo !== observationsRequestNo || selectedTarget?.id !== target.id) return;
       if (!Array.isArray(apiRes?.frames)) {
         throw new Error("Observation API returned an invalid response (expected a frames array).");
       }
 
       window.dispatchEvent(
-        new CustomEvent("spherex:framesLoaded", { detail: { frames: apiRes.frames } })
+        new CustomEvent("spherex:framesLoaded", {
+          detail: { frames: apiRes.frames, video: apiRes.video || null },
+        })
       );
     } catch (err) {
-      if (selectedTarget?.id !== target.id) return;
+      if (requestNo !== observationsRequestNo || selectedTarget?.id !== target.id) return;
       window.dispatchEvent(
         new CustomEvent("spherex:framesError", {
           detail: { message: err?.message || "Failed to load observations via observationsApi.js." },
@@ -2928,6 +2938,142 @@ document.addEventListener("DOMContentLoaded", () => {
   let timerId = null;
   let fastBlink = false;
 
+  // --- Mode vidéo : le backend renvoie UNE vidéo MP4 + la frise (une entrée par image).
+  // La vidéo est la source de vérité : la case de détails suit la vidéo, et changer
+  // la date (points, curseur, Prev/Next) déplace la vidéo à cette date.
+  let videoMode = false;
+  let syncingFromVideo = false;
+  const VIDEO_SPEEDS = [1, 2, 4, 0.5, 0.25];
+  let videoSpeedIdx = 0;
+
+  function setPlayButtons(playing) {
+    playBtn.classList.toggle("primary", playing);
+    pauseBtn.classList.toggle("primary", !playing);
+  }
+
+  function syncFromVideo() {
+    if (!videoMode || !frames.length || !cutoutVideo) return;
+    const idx = window.ObservationsApi?.indexAtTime
+      ? window.ObservationsApi.indexAtTime(frames, cutoutVideo.currentTime)
+      : currentIndex;
+    if (idx !== currentIndex) {
+      syncingFromVideo = true;
+      try {
+        goToEpoch(idx);
+      } finally {
+        syncingFromVideo = false;
+      }
+    }
+  }
+
+  function videoRafLoop() {
+    syncFromVideo();
+    if (videoMode && cutoutVideo && !cutoutVideo.paused && !cutoutVideo.ended) {
+      requestAnimationFrame(videoRafLoop);
+    }
+  }
+
+  // --- Repère de la cible : dessiné par le front par-dessus la vidéo propre
+  // (la vidéo reste l'image brute du ciel ; positions fournies par le backend).
+  let showMarkers = true;
+  let videoInfo = null;
+
+  function drawMarkers() {
+    if (!markerCanvas) return;
+    const stage = markerCanvas.parentElement;
+    const W = stage.clientWidth, H = stage.clientHeight;
+    const dpr = window.devicePixelRatio || 1;
+    if (markerCanvas.width !== Math.round(W * dpr) || markerCanvas.height !== Math.round(H * dpr)) {
+      markerCanvas.width = Math.round(W * dpr);
+      markerCanvas.height = Math.round(H * dpr);
+    }
+    const ctx = markerCanvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    if (!showMarkers || !videoMode || !frames.length) return;
+    const vw = cutoutVideo.videoWidth || videoInfo?.width;
+    const vh = cutoutVideo.videoHeight || videoInfo?.height;
+    if (!vw || !vh) return;
+    // object-fit: contain -> échelle et décalage de l'image dans le panneau
+    const k = Math.min(W / vw, H / vh);
+    const ox = (W - vw * k) / 2, oy = (H - vh * k) / 2;
+    const P = (p) => ({ x: ox + p.x * k, y: oy + p.y * k });
+
+    // trajectoire ajustée (positions prédites), discrète
+    const pred = frames.map((f) => f.markerPredicted).filter(Boolean).map(P);
+    if (pred.length > 1) {
+      ctx.strokeStyle = "rgba(255,255,255,0.45)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      pred.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    // positions mesurées jusqu'à l'image courante
+    frames.slice(0, currentIndex).forEach((f) => {
+      if (!f.markerMeasured) return;
+      const p = P(f.markerMeasured);
+      ctx.fillStyle = "rgba(0,229,255,0.55)";
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    // cible dans l'image courante : cercle plein = mesurée, pointillé = seulement prédite
+    const f = frames[currentIndex];
+    const pos = f?.markerMeasured || f?.markerPredicted;
+    if (!pos) return;
+    const p = P(pos);
+    const r = Math.min(30, Math.max(8, 2.5 * (videoInfo?.pxScale || 6) * k)); // ≈ 2,5 px SPHEREx
+    ctx.strokeStyle = f.markerMeasured && f.usedInFit ? "#00e5ff" : "rgba(200,200,200,0.9)";
+    ctx.lineWidth = 1.6;
+    if (!f.markerMeasured) ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // petites graduations pour bien voir la cible
+    ctx.beginPath();
+    [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => {
+      ctx.moveTo(p.x + dx * (r + 3), p.y + dy * (r + 3));
+      ctx.lineTo(p.x + dx * (r + 9), p.y + dy * (r + 9));
+    });
+    ctx.stroke();
+  }
+
+  if (markerToggleBtn) {
+    markerToggleBtn.addEventListener("click", () => {
+      showMarkers = !showMarkers;
+      markerToggleBtn.textContent = showMarkers ? "◎ Cible: ON" : "◎ Cible: OFF";
+      markerToggleBtn.classList.toggle("active", showMarkers);
+      drawMarkers();
+    });
+  }
+  window.addEventListener("resize", drawMarkers);
+  document.addEventListener("fullscreenchange", () => setTimeout(drawMarkers, 50));
+  if (cutoutVideo) cutoutVideo.addEventListener("loadedmetadata", drawMarkers);
+
+  function clearVideo() {
+    videoMode = false;
+    videoInfo = null;
+    drawMarkers();
+    if (!cutoutVideo) return;
+    cutoutVideo.pause();
+    cutoutVideo.removeAttribute("src");
+    cutoutVideo.load();
+  }
+
+  if (cutoutVideo) {
+    cutoutVideo.addEventListener("play", () => {
+      setPlayButtons(true);
+      requestAnimationFrame(videoRafLoop);
+    });
+    cutoutVideo.addEventListener("pause", () => setPlayButtons(false));
+    cutoutVideo.addEventListener("ended", () => setPlayButtons(false));
+    cutoutVideo.addEventListener("timeupdate", syncFromVideo);
+    cutoutVideo.addEventListener("seeked", syncFromVideo);
+  }
+
   function renderDots() {
     ticksEl.innerHTML = "";
     frames.forEach((f, idx) => {
@@ -2958,9 +3104,17 @@ document.addEventListener("DOMContentLoaded", () => {
       dot.classList.toggle("active", i === currentIndex);
     });
 
-    if (frame.imageUrl && cutoutImg) {
+    if (videoMode) {
+      // la date a été changée par l'utilisateur -> la vidéo va à cette date
+      if (!syncingFromVideo && typeof frame.videoTime === "number" &&
+          Math.abs(cutoutVideo.currentTime - frame.videoTime) > 0.05) {
+        cutoutVideo.currentTime = frame.videoTime;
+      }
+    } else if (frame.imageUrl && cutoutImg) {
       cutoutImg.src = frame.imageUrl;
     }
+    bandEl.title = frame.note || "";
+    drawMarkers();
 
     if (selectedTarget) {
       renderCutout(selectedTarget, currentIndex, frames.length);
@@ -2974,6 +3128,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function startPlayback() {
+    if (videoMode) {
+      if (cutoutVideo.ended) cutoutVideo.currentTime = 0;
+      cutoutVideo.play().catch(() => {});
+      setPlayButtons(true);
+      return;
+    }
     if (timerId || frames.length <= 1) return;
     playBtn.classList.add("primary");
     pauseBtn.classList.remove("primary");
@@ -2981,6 +3141,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function stopPlayback() {
+    if (videoMode && cutoutVideo && !cutoutVideo.paused) cutoutVideo.pause();
     if (timerId) {
       clearInterval(timerId);
       timerId = null;
@@ -2990,6 +3151,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function togglePlayback() {
+    if (videoMode) {
+      cutoutVideo.paused || cutoutVideo.ended ? startPlayback() : stopPlayback();
+      return;
+    }
     timerId ? stopPlayback() : startPlayback();
   }
 
@@ -3007,6 +3172,14 @@ document.addEventListener("DOMContentLoaded", () => {
   pauseBtn.addEventListener("click", stopPlayback);
 
   speedBtn.addEventListener("click", () => {
+    if (videoMode) {
+      videoSpeedIdx = (videoSpeedIdx + 1) % VIDEO_SPEEDS.length;
+      const rate = VIDEO_SPEEDS[videoSpeedIdx];
+      cutoutVideo.playbackRate = rate;
+      speedBtn.textContent = `⏱ Speed: ×${rate}`;
+      speedBtn.classList.toggle("fast", rate > 1);
+      return;
+    }
     fastBlink = !fastBlink;
     speedBtn.textContent = fastBlink ? "⚡ Speed: 3x" : "⏱ Speed: 1x";
     speedBtn.classList.toggle("fast", fastBlink);
@@ -3054,6 +3227,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("spherex:coordinatesChanged", (e) => {
     stopPlayback();
+    clearVideo();
     const label = e.detail?.label ? ` for ${e.detail.label}` : "";
     bodyEl.classList.add("tl-hidden");
     statusEl.className = "timeline-status loading";
@@ -3064,6 +3238,17 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("spherex:framesLoaded", (e) => {
     stopPlayback();
     frames = Array.isArray(e.detail?.frames) ? e.detail.frames : [];
+    const vid = e.detail?.video;
+    if (cutoutVideo && vid?.mp4 && frames.some((f) => typeof f.videoTime === "number")) {
+      videoMode = true;
+      videoInfo = vid;
+      if (cutoutImg) cutoutImg.removeAttribute("src");
+      if (cutoutVideo.getAttribute("src") !== vid.mp4) cutoutVideo.src = vid.mp4;
+      cutoutVideo.playbackRate = VIDEO_SPEEDS[videoSpeedIdx];
+      speedBtn.textContent = `⏱ Speed: ×${VIDEO_SPEEDS[videoSpeedIdx]}`;
+    } else {
+      clearVideo();
+    }
     if (!frames.length) {
       bodyEl.classList.add("tl-hidden");
       statusEl.className = "timeline-status";
@@ -3081,6 +3266,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("spherex:framesError", (e) => {
     stopPlayback();
+    clearVideo();
     bodyEl.classList.add("tl-hidden");
     statusEl.className = "timeline-status error";
     statusEl.textContent = e.detail?.message || "Failed to load observations.";
