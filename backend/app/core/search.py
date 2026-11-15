@@ -69,6 +69,11 @@ def _irsa_sia(ra: float, dec: float, radius_deg: float, collection: str):
 
 SiaFn = Callable[[float, float, float, str], object]
 
+# IRSA renvoie parfois des erreurs passagères (502 « Proxy Error », 503) : quelques
+# nouvelles tentatives espacées avant d'abandonner une collection.
+SIA_RETRIES = 3
+SIA_BACKOFF_S = (3.0, 8.0)
+
 
 # --- Conversion d'une ligne SIA en ImageRecord --------------------------------
 def _val(row, col):
@@ -177,6 +182,17 @@ def row_to_record(row, collection: str, target: Target) -> Optional[ImageRecord]
 
 
 # --- Recherche principale -----------------------------------------------------
+def cached_search(target: Target) -> Optional[SearchResult]:
+    """Dernière recherche IRSA en cache pour cette cible (sans appel réseau), ou None."""
+    hit = cache_get(f"{CACHE_VERSION}|{target.cache_key}|{','.join(config.COLLECTIONS)}")
+    if hit is None:
+        return None
+    data, created = hit
+    data.update(source="cache", target=target.model_dump(),
+                cached_at=datetime.fromtimestamp(created, timezone.utc).isoformat())
+    return SearchResult(**data)
+
+
 def search_images(target: Target, refresh: bool = False,
                   sia: SiaFn = _irsa_sia) -> SearchResult:
     key = f"{CACHE_VERSION}|{target.cache_key}|{','.join(config.COLLECTIONS)}"
@@ -203,11 +219,18 @@ def search_images(target: Target, refresh: bool = False,
     records: dict[tuple, ImageRecord] = {}
     errors: list[str] = []
     for coll in config.COLLECTIONS:
-        try:
-            table = sia(target.ra_deg, target.dec_deg,
-                        config.SEARCH_RADIUS_ARCSEC / 3600.0, coll)
-        except Exception as exc:  # noqa: BLE001 — IRSA peut être lent ou en panne
-            errors.append(f"{coll}: {type(exc).__name__}: {exc}")
+        table, last_exc = None, None
+        for attempt in range(SIA_RETRIES):
+            try:
+                table = sia(target.ra_deg, target.dec_deg,
+                            config.SEARCH_RADIUS_ARCSEC / 3600.0, coll)
+                break
+            except Exception as exc:  # noqa: BLE001 — IRSA peut être lent ou en panne
+                last_exc = exc
+                if attempt < SIA_RETRIES - 1:   # panne passagère (502/503) : on réessaie
+                    time.sleep(SIA_BACKOFF_S[min(attempt, len(SIA_BACKOFF_S) - 1)])
+        if table is None:
+            errors.append(f"{coll}: {type(last_exc).__name__}: {last_exc}")
             continue
         for row in table:
             rec = row_to_record(row, coll, target)

@@ -7,12 +7,27 @@ from fastapi.staticfiles import StaticFiles
 from app.core import config
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import images, target
+from app.routers import images, target, updates
 
-app = FastAPI(title="SPHEREx Time-Lapse API", version="0.1.0")
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(_app):
+    """Au démarrage : planificateur des mises à jour hebdomadaires (nouvelles images SPHEREx)."""
+    import asyncio
+    from app.routers import updates
+    task = asyncio.ensure_future(updates.scheduler_loop()) if config.AUTO_UPDATE else None
+    yield
+    if task:
+        task.cancel()
+
+
+app = FastAPI(title="SPHEREx Time-Lapse API", version="0.1.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 app.include_router(target.router)
 app.include_router(images.router)
+app.include_router(updates.router)
 # images rendues (PNG/GIF alignés) servies sous /files/...
 app.mount("/files", StaticFiles(directory=str(config.CACHE_DIR)), name="files")
 

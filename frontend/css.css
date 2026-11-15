@@ -1928,3 +1928,1138 @@ body {
   height: 100%;
   pointer-events: none;
 }
+
+/* Remarque du backend sous la frise (désaccord entre groupes, raccord…) */
+.tl-note {
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+  margin: 2px 0 6px;
+  min-height: 1em;
+}
+
+.tl-note:empty {
+  display: none;
+}
+
+.tl-note.warn {
+  color: var(--accent-amber);
+  background: var(--accent-amber-soft);
+  border: 1px solid rgba(232, 155, 72, 0.35);
+  border-radius: 6px;
+  padding: 5px 8px;
+}
+
+/* Choix du groupe affiché (tous les groupes ou un seul) */
+.group-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 0;
+}
+
+.group-picker label {
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.group-picker select {
+  width: 100%;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 0.72rem;
+}
+
+.group-info {
+  font-size: 0.66rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+/* Message court sur l'accord entre groupes */
+.group-alert {
+  margin: 6px 0;
+  padding: 7px 9px;
+  border-radius: 7px;
+  border: 1px solid var(--border-strong);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.group-alert .ga-title {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.group-alert.ok {
+  border-color: rgba(56, 178, 172, 0.45);
+  background: var(--accent-teal-soft);
+  color: #9fe3dd;
+}
+
+.group-alert.info {
+  border-color: rgba(139, 147, 167, 0.45);
+  background: rgba(139, 147, 167, 0.12);
+  color: var(--text-primary);
+}
+
+.group-alert.warn {
+  border-color: rgba(232, 155, 72, 0.55);
+  background: var(--accent-amber-soft);
+  color: var(--accent-amber);
+}
+
+/* Fenêtre « Vidéo SPHEREx » ouverte par un clic sur l'objet */
+.video-modal-card {
+  width: min(1120px, 96vw);
+  max-height: 94vh;
+  overflow: auto;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  padding: 14px 16px 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+}
+
+.video-modal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+@media (max-width: 860px) {
+  .video-modal-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.video-modal-main .cutout-media-stage {
+  width: min(100%, 64vh);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+}
+
+.video-modal-main .timeline-dock {
+  position: static;
+  transform: none;
+  width: 100%;
+  margin-top: 12px;
+  box-shadow: none;
+}
+
+.video-modal-side .group-picker select {
+  font-size: 0.78rem;
+}
+
+.video-modal-side .group-info,
+.video-modal-side .group-alert {
+  font-size: 0.76rem;
+}
+
+/* Date / détecteur / longueur d'onde : grands et lisibles sous la vidéo */
+.epoch-readout {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1.2fr;
+  gap: 8px;
+  margin: 8px 0 10px;
+}
+
+.ro-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: rgba(237, 240, 247, 0.05);
+  border: 1px solid var(--border-subtle);
+}
+
+.ro-lbl {
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.ro-val {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  border-radius: 5px;
+}
+
+.ro-val.changed {
+  animation: ro-flash 700ms ease-out;
+}
+
+@keyframes ro-flash {
+  0% { background: rgba(56, 178, 172, 0.45); color: #ffffff; }
+  100% { background: transparent; }
+}
+
+/* la date et la bande en petit deviennent inutiles : on garde seulement « Epoch n / N » */
+.tl-info .tl-date,
+.tl-info .tl-band {
+  display: none;
+}
+
+/* Remarques et message de désaccord : à droite, clairs et grands */
+.tl-note {
+  margin: 6px 0;
+  font-size: 0.74rem;
+}
+
+.tl-note.warn {
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.45;
+  padding: 9px 11px;
+  border-width: 2px;
+}
+
+.group-alert {
+  font-size: 0.82rem;
+  padding: 10px 12px;
+  border-width: 2px;
+}
+
+.group-alert .ga-title {
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.video-modal-side .tl-note.warn,
+.video-modal-side .group-alert {
+  font-size: 0.92rem;
+}
+
+.video-modal-side .group-alert .ga-title {
+  font-size: 1.05rem;
+}
+
+.video-modal-main .ro-val {
+  font-size: 1.35rem;
+}
+
+@media (max-width: 640px) {
+  .epoch-readout {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ro-date-item {
+    grid-column: 1 / -1;
+  }
+}
+
+/* La frise passe au-dessus des panneaux caméra / inspecteur (sinon la date et λ sont cachées) */
+.timeline-dock {
+  z-index: 26;
+}
+
+/* Sur la page (hors fenêtre vidéo) : lisible mais plus compact */
+.timeline-dock .ro-item {
+  padding: 5px 9px;
+}
+
+.timeline-dock .ro-val {
+  font-size: 1.05rem;
+}
+
+.video-modal-main .timeline-dock .ro-item {
+  padding: 7px 10px;
+}
+
+/* Remarques sur plusieurs lignes (titre, « La date revient en arrière… », « Pourquoi ? … ») */
+.tl-note {
+  white-space: pre-line;
+}
+
+.tl-note.info {
+  font-size: 0.84rem;
+  line-height: 1.45;
+  padding: 9px 11px;
+  border-radius: 7px;
+  border: 2px solid rgba(56, 178, 172, 0.45);
+  background: var(--accent-teal-soft);
+  color: #c9f1ed;
+}
+
+.video-modal-side .tl-note.info {
+  font-size: 0.92rem;
+}
+
+/* =========================================================
+   Barre du haut, 2 lignes :
+     1) boutons « 3D Overview », « 3D Trajectory », « 2-Date Compare »
+     2) à gauche : RA, Dec, FOV, Band (bien visibles pour taper les coordonnées)
+        à droite : grand bouton « Track 3D »
+   ========================================================= */
+.stage-topbar {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.stage-topbar .coord-bar {
+  margin-left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding: 0;
+  pointer-events: none;            /* le vide entre les deux ne bloque pas la vue 3D */
+}
+
+.stage-topbar .coord-inputs {
+  pointer-events: auto;
+  background: var(--bg-surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(56, 178, 172, 0.45);
+  border-radius: 12px;
+  padding: 7px 10px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.96);
+}
+
+.stage-topbar .field-group {
+  font-size: 0.76rem;
+  padding: 5px 9px;
+}
+
+.stage-topbar .field-group input {
+  width: 86px;
+  font-size: 0.85rem;
+}
+
+.stage-topbar .track-btn {
+  pointer-events: auto;
+  font-size: 1rem;
+  padding: 11px 26px;
+  border-radius: 12px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(56, 178, 172, 0.35);
+}
+
+.stage-topbar .form-error {
+  pointer-events: auto;
+  max-width: 560px;
+}
+
+/* À droite : Band + grand « Track 3D », sur la largeur du panneau de droite, juste
+   au-dessus de lui ; le panneau descend sous la barre du haut (plus de chevauchement). */
+.stage-topbar .coord-right {
+  pointer-events: auto;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  width: min(386px, 44vw);
+}
+
+.stage-topbar .coord-right .field-group {
+  flex: 0 1 auto;
+  min-width: 0;
+  background: var(--bg-surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(56, 178, 172, 0.45);
+  border-radius: 12px;
+  padding: 6px 10px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.9);
+}
+
+.stage-topbar .coord-right .field-group select {
+  max-width: 150px;
+  text-overflow: ellipsis;
+}
+
+.stage-topbar .coord-right .track-btn {
+  flex: 1 1 auto;
+  white-space: nowrap;
+}
+
+.inspector-card {
+  top: 120px;
+  max-height: calc(100vh - 220px);
+}
+
+/* FOV : liste + champ libre (« Autre… ») */
+.stage-topbar .fov-group select {
+  width: auto;
+  font-family: inherit;
+  font-size: 0.76rem;
+  cursor: pointer;
+}
+
+.stage-topbar .fov-group input.fov-custom {
+  width: 46px;
+  border-bottom: 1px solid var(--accent-teal);
+}
+
+.stage-topbar .fov-unit {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+/* Un seul bouton (« Compare 2 Dates ») dans le panneau de droite : pleine largeur */
+.inspector-action-pair {
+  grid-template-columns: 1fr;
+}
+
+/* =========================================================
+   « Groupe affiché » : cartes cliquables
+   ========================================================= */
+.group-picker-title {
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.group-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 42vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.group-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: rgba(237, 240, 247, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 8px 11px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
+}
+
+.group-card:hover {
+  border-color: rgba(56, 178, 172, 0.6);
+  background: rgba(56, 178, 172, 0.08);
+  transform: translateX(2px);
+}
+
+.group-card.active {
+  border: 2px solid var(--accent-teal);
+  background: var(--accent-teal-soft);
+  box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.12);
+}
+
+.group-card.warn .gc-title {
+  color: var(--accent-amber);
+}
+
+.gc-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.gc-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.gc-sub {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.gc-badge {
+  flex: 0 0 auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.74rem;
+  color: #9fe3dd;
+  white-space: nowrap;
+}
+
+.gc-badge:empty {
+  display: none;
+}
+
+.video-modal-side .gc-title {
+  font-size: 0.95rem;
+}
+
+.video-modal-side .gc-sub,
+.video-modal-side .gc-badge {
+  font-size: 0.78rem;
+}
+
+.video-modal-side .group-cards {
+  max-height: 46vh;
+}
+
+/* Boutons « ◎ Cible » et « ⛶ Full » : plus grands et plus visibles */
+.cutout-header {
+  align-items: center;
+  gap: 8px;
+}
+
+.cutout-btn-group {
+  gap: 8px;
+}
+
+.cutout-btn-group .diff-toggle {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 7px 13px;
+  border-radius: 9px;
+  border-width: 2px;
+  cursor: pointer;
+  transition: background-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+}
+
+.cutout-btn-group .diff-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+#marker-toggle-btn.active {
+  background: var(--accent-amber-soft);
+  border-color: var(--accent-amber);
+  color: var(--accent-amber);
+}
+
+#cutout-fullscreen-btn {
+  background: var(--accent-teal);
+  border-color: var(--accent-teal);
+  color: #000001;
+}
+
+#cutout-fullscreen-btn:hover {
+  background: #4fd1c5;
+}
+
+/* =========================================================
+   Titre « Vidéo SPHEREx » : plus visible
+   ========================================================= */
+.cutout-header {
+  padding: 4px 2px 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(56, 178, 172, 0.25);
+}
+
+.cutout-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* point « en direct » qui pulse doucement */
+.ct-dot {
+  flex: 0 0 auto;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #4fd1c5;
+  box-shadow: 0 0 0 0 rgba(79, 209, 197, 0.7);
+  animation: ct-pulse 2s ease-out infinite;
+}
+
+@keyframes ct-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(79, 209, 197, 0.65); }
+  70%  { box-shadow: 0 0 0 9px rgba(79, 209, 197, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 209, 197, 0); }
+}
+
+.ct-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.ct-main {
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  white-space: nowrap;
+  background: linear-gradient(90deg, #e6fffb 0%, #4fd1c5 55%, #9f7aea 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ct-sub {
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* =========================================================
+   « Groupe affiché » : titre visible + barre de cartes qui défile
+   ========================================================= */
+.group-picker {
+  margin: 10px 0 8px;
+  padding: 10px 10px 8px;
+  border: 1px solid rgba(56, 178, 172, 0.28);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(56, 178, 172, 0.09), rgba(56, 178, 172, 0.02));
+}
+
+.group-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.group-picker-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--text-primary);
+}
+
+.gp-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  color: #000001;
+  background: var(--accent-teal);
+}
+
+.gp-nav {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.gp-count {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.74rem;
+  color: #9fe3dd;
+  margin-right: 2px;
+}
+
+.gp-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--accent-teal);
+  background: rgba(56, 178, 172, 0.12);
+  color: #e6fffb;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.gp-arrow:hover:not(:disabled) {
+  background: var(--accent-teal);
+  color: #000001;
+  transform: scale(1.06);
+}
+
+.gp-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* la barre : cartes côte à côte, défilement horizontal avec aimantation */
+.group-cards {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 3px 3px 9px;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 3px;
+  outline: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-teal) rgba(237, 240, 247, 0.06);
+}
+
+.group-cards::-webkit-scrollbar {
+  height: 7px;
+}
+
+.group-cards::-webkit-scrollbar-track {
+  background: rgba(237, 240, 247, 0.06);
+  border-radius: 6px;
+}
+
+.group-cards::-webkit-scrollbar-thumb {
+  background: var(--accent-teal);
+  border-radius: 6px;
+}
+
+.group-cards:focus-visible {
+  box-shadow: 0 0 0 2px rgba(79, 209, 197, 0.5);
+  border-radius: 10px;
+}
+
+.group-card {
+  flex: 0 0 auto;
+  width: 214px;
+  min-height: 84px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  scroll-snap-align: start;
+}
+
+.group-card:hover {
+  transform: translateY(-2px);
+}
+
+.gc-sub {
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.video-modal-side .group-cards {
+  max-height: none;
+}
+
+.video-modal-side .group-card {
+  width: 236px;
+}
+
+/* l'en-tête tient sur une ligne : titre complet + boutons Cible / Full */
+.cutout-btn-group {
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+.cutout-btn-group .diff-toggle {
+  white-space: nowrap;
+  font-size: 0.78rem;
+  padding: 7px 10px;
+}
+
+.cutout-title {
+  flex: 1 1 auto;
+  gap: 8px;
+}
+
+.ct-main {
+  font-size: 1.02rem;
+}
+
+/* « Compare 2 Dates » : image carrée entière (comme la vidéo), sans rognage */
+.compare-modal-card {
+  width: min(96vw, 1060px);
+}
+
+.compare-img-box {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 64vh;
+}
+
+.compare-img {
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+/* =========================================================
+   Vitesse de lecture : barre de boutons bien visible
+   ========================================================= */
+.tl-meta {
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.speed-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 5px 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(56, 178, 172, 0.45);
+  background: linear-gradient(90deg, rgba(56, 178, 172, 0.14), rgba(56, 178, 172, 0.04));
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.speed-control:hover {
+  border-color: var(--accent-teal);
+  box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.14);
+}
+
+.speed-control.fast {
+  border-color: rgba(246, 173, 85, 0.7);
+  background: linear-gradient(90deg, rgba(246, 173, 85, 0.16), rgba(246, 173, 85, 0.04));
+}
+
+.speed-control.bump {
+  animation: sc-bump 260ms ease-out;
+}
+
+@keyframes sc-bump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.sc-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #e6fffb;
+  white-space: nowrap;
+}
+
+.sc-icon {
+  font-size: 0.95rem;
+}
+
+.sc-track {
+  display: inline-flex;
+  gap: 3px;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgba(0, 0, 1, 0.55);
+}
+
+.sc-btn {
+  min-width: 46px;
+  padding: 5px 9px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.sc-btn:hover {
+  color: #e6fffb;
+  background: rgba(56, 178, 172, 0.22);
+  transform: translateY(-1px);
+}
+
+.sc-btn.active {
+  background: var(--accent-teal);
+  color: #000001;
+  box-shadow: 0 0 12px rgba(79, 209, 197, 0.55);
+}
+
+.speed-control.fast .sc-btn.active {
+  background: var(--accent-amber);
+  box-shadow: 0 0 12px rgba(246, 173, 85, 0.55);
+}
+
+/* =========================================================
+   « Compare 2 Dates » : repère de la cible par-dessus l'image
+   ========================================================= */
+.compare-img-box {
+  position: relative;
+}
+
+.compare-marker {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.compare-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  margin-top: 12px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.compare-legend i {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+  font-style: normal;
+}
+
+.cl-solid,
+.cl-ghost {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+}
+
+.cl-solid {
+  border: 2px solid #00e5ff;
+}
+
+.cl-ghost {
+  border: 1.5px dashed rgba(255, 255, 255, 0.75);
+}
+
+.cl-arrow {
+  color: #ffb547;
+  font-weight: 800;
+}
+
+.cl-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.cl-toggle input {
+  accent-color: var(--accent-teal);
+  width: 15px;
+  height: 15px;
+}
+
+/* =========================================================
+   Animation d'ouverture : arrivée depuis le fond de l'espace
+   ========================================================= */
+.intro-overlay {
+  --intro-t: 0;
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.intro-overlay.is-hidden {
+  display: none;
+}
+
+.intro-title {
+  text-align: center;
+  /* le titre grossit doucement puis s'efface pendant l'approche */
+  opacity: clamp(0, calc(1.6 - var(--intro-t) * 2.4), 1);
+  transform: scale(calc(0.92 + var(--intro-t) * 0.5));
+  filter: blur(calc(var(--intro-t) * 3px));
+  animation: intro-title-in 1.4s ease-out both;
+}
+
+@keyframes intro-title-in {
+  from { opacity: 0; letter-spacing: 0.5em; filter: blur(8px); }
+}
+
+.intro-eyebrow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.32em;
+  color: #9fe3dd;
+  margin-bottom: 10px;
+}
+
+.intro-main {
+  font-size: clamp(3rem, 9vw, 7.5rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  background: linear-gradient(90deg, #e6fffb 0%, #4fd1c5 45%, #9f7aea 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 60px rgba(79, 209, 197, 0.25);
+}
+
+.intro-sub {
+  margin-top: 14px;
+  font-size: 1.05rem;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary);
+  animation: intro-blink 1.6s ease-in-out infinite;
+}
+
+@keyframes intro-blink {
+  50% { opacity: 0.45; }
+}
+
+.intro-skip {
+  position: absolute;
+  right: 28px;
+  bottom: 28px;
+  pointer-events: auto;
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(79, 209, 197, 0.6);
+  background: rgba(0, 0, 1, 0.55);
+  color: #e6fffb;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background-color 140ms ease;
+}
+
+.intro-skip:hover {
+  background: var(--accent-teal);
+  color: #000001;
+}
+
+.intro-overlay.is-fading {
+  animation: intro-out 0.9s ease-out forwards;
+}
+
+@keyframes intro-out {
+  to { opacity: 0; }
+}
+
+/* pendant l'approche : l'interface est cachée, seul l'espace est visible */
+body.intro-running .dwarf-sidebar,
+body.intro-running .stage-topbar,
+body.intro-running .camera-dock,
+body.intro-running .galaxy-legend,
+body.intro-running .timeline-dock,
+body.intro-running .trajectory-overlay,
+body.intro-running .mobile-drawer-toggle {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* à l'arrivée : les panneaux apparaissent un à un */
+body.intro-reveal .dwarf-sidebar { animation: intro-panel-in 0.8s ease-out both; }
+body.intro-reveal .stage-topbar { animation: intro-panel-in 0.8s ease-out 0.12s both; }
+body.intro-reveal .camera-dock { animation: intro-panel-in 0.8s ease-out 0.24s both; }
+body.intro-reveal .galaxy-legend { animation: intro-panel-in 0.8s ease-out 0.3s both; }
+body.intro-reveal .timeline-dock { animation: intro-panel-in 0.8s ease-out 0.4s both; }
+
+@keyframes intro-panel-in {
+  from { opacity: 0; filter: blur(6px); }
+  to { opacity: 1; filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-title, .intro-sub { animation: none; }
+}
+
+/* L'animation d'ouverture occupe tout l'écran : la barre de gauche est repliée
+   pendant l'approche, puis glisse en place à l'arrivée */
+body.intro-running .dwarf-sidebar {
+  width: 0 !important;
+  flex-basis: 0 !important;
+  overflow: hidden;
+  border: none;
+}
+
+body.intro-reveal .dwarf-sidebar {
+  overflow: hidden;
+  transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1), flex-basis 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* le contenu garde sa largeur pendant qu'il glisse (pas de texte écrasé) */
+body.intro-running .dwarf-sidebar > *,
+body.intro-reveal .dwarf-sidebar > * {
+  min-width: var(--sidebar-width);
+}
+
+/* =========================================================
+   Fraîcheur des données SPHEREx (mise à jour automatique hebdomadaire)
+   ========================================================= */
+.data-freshness {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 6px 0 2px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(56, 178, 172, 0.22);
+  background: rgba(56, 178, 172, 0.06);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+.df-icon {
+  flex: 0 0 auto;
+}
+
+.data-freshness.updating {
+  border-color: rgba(246, 173, 85, 0.5);
+  background: rgba(246, 173, 85, 0.08);
+  color: #f6c88f;
+}
+
+.data-freshness.updating .df-icon {
+  display: inline-block;
+  animation: df-orbit 1.6s linear infinite;
+}
+
+@keyframes df-orbit {
+  to { transform: rotate(360deg); }
+}
+
+.data-update-toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 6px 0;
+  padding: 9px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--accent-teal);
+  background: linear-gradient(90deg, rgba(56, 178, 172, 0.22), rgba(56, 178, 172, 0.08));
+  color: #e6fffb;
+  font-size: 0.8rem;
+  font-weight: 600;
+  animation: dut-in 400ms ease-out;
+}
+
+@keyframes dut-in {
+  from { opacity: 0; transform: translateY(-6px); }
+}
+
+.dut-btn {
+  flex: 0 0 auto;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent-teal);
+  color: #000001;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.dut-btn:hover {
+  background: #4fd1c5;
+}

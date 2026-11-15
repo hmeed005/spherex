@@ -114,7 +114,7 @@ def test_agreeing_groups_one_video_most_visible_image():
     seq = plan.sequences[0]
     assert seq.kind == "unique" and len(seq.frame_ids) == 3          # t1, t2, t3
     assert seq.frame_ids[1] == "G210"                                 # la plus visible à t2
-    assert "concordantes" in seq.notes["G210"]
+    assert "même endroit" in seq.notes["G210"]
 
 
 def test_offset_groups_one_video_in_consecutive_blocks_no_interleaving():
@@ -127,7 +127,8 @@ def test_offset_groups_one_video_in_consecutive_blocks_no_interleaving():
     assert seq.frame_ids == ["G10", "G11", "G210", "G211"]
     assert [seq.segments[f][1] for f in seq.frame_ids] == ["groupe G1", "groupe G1",
                                                            "groupe G2", "groupe G2"]
-    assert seq.notes["G210"].startswith("⚠ nouveau bloc : groupe G2")
+    assert seq.notes["G210"].startswith("⚠ Séquence à part 2/2")
+    assert "La date revient en arrière" in seq.notes["G210"]
     assert len(plan.side_by_side) == 1
 
 
@@ -142,7 +143,7 @@ def test_groups_without_common_instant_chained_with_warning():
     g2 = track(0, 1.7, [365, 366], [2, 2], "G2", start=5)
     plan = plan_display(g1 + g2, fq(g1 + g2))
     assert len(plan.sequences) == 1 and plan.comparisons == []
-    assert any("non vérifiable" in n for n in plan.sequences[0].notes.values())
+    assert any("aucune date commune" in n for n in plan.sequences[0].notes.values())
 
 
 def test_agreeing_groups_first_then_each_conflicted_group_entirely():
@@ -211,3 +212,136 @@ def test_clean_crop_removes_empty_corners_of_rotated_cutout():
     assert np.isfinite(sub).all()                              # plus de coins vides
     assert c0 <= round(N / 2 * (1 - 1 / np.sqrt(2)))           # au pire n/√2
     assert not np.isfinite(rot[c0 - 1:N - c0 + 1, c0 - 1:N - c0 + 1]).all()  # carré maximal
+
+
+def test_outlier_image_keeps_original_rule_but_is_explained():
+    """RW Aurigae : une image aberrante en désaccord avec tous les groupes.
+    Règle d'origine conservée (tous les groupes impliqués sont montrés à part),
+    mais la remarque dit qui est probablement fautif et que les autres concordent."""
+    ms = []
+    for gi in range(5):
+        ms += track(0, 0.0, [0 + gi * 0.1, 180 + gi * 0.1, 365 + gi * 0.1], [0, 1, 2], f"G{gi}",
+                    noise=0.01, start=gi * 10)
+    ms += track(0, 0.0, [180.5], [1], "isolee_X", offset=(2.4, 0), noise=0.01, start=90)
+    plan = plan_display(ms, fq(ms))
+    assert set(plan.conflicted_groups) == {"G0", "G1", "G2", "G3", "G4", "isolee_X"}
+    seq = plan.sequences[0]
+    first_x = [f for f in seq.frame_ids if seq.segments[f][1] == "groupe isolee_X"][0]
+    assert "probablement défectueuse" in seq.notes[first_x]
+    first_g0 = [f for f in seq.frame_ids if seq.segments[f][1] == "groupe G0"][0]
+    assert "d'accord avec tous les autres" in seq.notes[first_g0]
+    first = seq.frame_ids[0]                                   # tous séparés : pas de bloc commun
+    assert "un par un" in seq.notes[first] and "revient en arrière" not in seq.notes[first]
+    assert "probablement aberrant(s) : isolee_X" in plan.summary
+
+
+def test_chance_level_and_clear_offsets_are_labelled():
+    """Écarts juste au-dessus de 3σ parmi beaucoup de comparaisons : « compatible avec le
+    hasard » ; écart de 11σ : « décalage net ». Aucun n'est retiré de l'affichage."""
+    from app.core.measure import GroupComparison, conflict_sigma, explain_conflicts
+
+    def comp(a, b, ratio, i):
+        return GroupComparison(group_a=a, group_b=b, visit=i, date="2025-09-01", dx_px=0.0,
+                               dy_px=ratio * 0.6, distance_px=ratio * 0.6, tolerance_px=0.6,
+                               agree=ratio <= 1, frame_a=f"a{i}", frame_b=f"b{i}")
+    comps = [comp(f"G{i % 20}", f"H{i % 23}", 0.3, i) for i in range(470)]
+    comps += [comp("D1", "D2", 1.11, 900), comp("Y", "Z", 3.8, 901)]
+    assert conflict_sigma(len(comps)) > 4.0
+    notes, stats = explain_conflicts(comps)
+    assert notes["D1"][0] == "info" and "par hasard" in notes["D1"][1]
+    assert "fiable" in notes["D1"][1]
+    assert notes["Y"][0] == "warn" and "écart net" in notes["Y"][1]
+    assert stats["n_over_3sigma"] == 2 and stats["n_clear"] == 1
+
+
+def test_one_video_per_group_with_its_own_motion(tmp_path):
+    """Vue « tous les groupes » (sequences[0]) + une vidéo PAR groupe : chaque vue de groupe
+    est chronologique, ne contient que ce groupe et donne le mouvement mesuré sur lui seul."""
+    from app.core.measure import plan_display, render_display
+    from app.core.screen import FrameQuality
+
+    g1 = track(0.0, 1.7, [0, 180, 365], [0, 1, 2], "D2_1.40", noise=0.02)
+    g2 = track(0.0, 1.7, [1, 181, 366], [0, 1, 2], "D5_4.30", noise=0.02, start=10)
+    solo = track(0.0, 1.7, [182], [1], None, noise=0.02, start=20)        # image isolée
+    ms = g1 + g2 + solo
+    frames, cache = {}, {}
+    yy, xx = np.mgrid[:40, :40]
+    for m in ms:
+        det, wl = ("D2", 1.40) if (m.group_id or "").startswith("D2") else ("D5", 4.30)
+        frames[m.frame_id] = FrameQuality(frame_id=m.frame_id, obs_id=m.frame_id, status="nette",
+                                          keep=True, reason="", snr=50.0, detector=det,
+                                          wavelength_um=wl, date_utc=m.date_utc)
+        m.detector, m.wavelength_um = det, wl
+        img = 1.0 + 100 * np.exp(-((xx - m.x_px + 9) ** 2 + (yy - m.y_px + 9) ** 2) / 2.0)
+        cache[m.frame_id] = {"image": img, "flags": np.zeros((40, 40), dtype=np.int64)}
+    for m in ms:
+        m.x_px, m.y_px = m.x_px - 9, m.y_px - 9
+    motion = fit_motion(ms)
+    plan = plan_display(motion.measures, frames)
+    plan = render_display(None, motion, plan, frames, cache, tmp_path / "out")
+    assert plan.sequences and plan.sequences[0].video                   # vue « tous les groupes »
+    names = [s.groups[0] for s in plan.group_sequences]
+    assert names[:2] in (["D2_1.40", "D5_4.30"], ["D5_4.30", "D2_1.40"])
+    assert names[-1].startswith("isolee_")                               # isolées à la fin
+    for s in plan.group_sequences:
+        tl = s.video.timeline
+        assert [e.date_utc for e in tl] == sorted(e.date_utc for e in tl)   # chronologique
+        assert {e.group for e in tl} == {s.groups[0]}                       # un seul groupe
+        assert s.video.mp4 and s.title
+    d2 = plan.group_sequences[names.index("D2_1.40")]
+    assert d2.info["n_passages"] == 3 and abs(d2.info["mu_arcsec_yr"] - 1.7 * 6.15) < 2.0
+    assert "″/an" in d2.title
+    iso = plan.group_sequences[-1]
+    assert "pas de mouvement mesurable" in iso.title
+    # « Compare 2 Dates » : une image fixe PROPRE par date, identique à l'image de la vidéo
+    # (carrée, nord en haut, sans coins vides, sans médaillon), pour toutes les vues
+    import matplotlib.image as mpimg
+    for s in [plan.sequences[0], *plan.group_sequences]:
+        for e in s.video.timeline:
+            assert e.image_url and e.image_url.endswith(".png") and "_date_" in e.image_url
+            still = mpimg.imread(e.image_url)
+            assert still.shape[0] == still.shape[1] == s.video.height
+
+
+def test_user_alert_is_short_and_matches_the_situation():
+    from app.core.measure import GroupComparison, explain_conflicts, user_alert
+
+    def comp(a, b, ratio, i):
+        return GroupComparison(group_a=a, group_b=b, visit=i, date="2025-09-01", dx_px=0.0,
+                               dy_px=ratio * 0.6, distance_px=ratio * 0.6, tolerance_px=0.6,
+                               agree=ratio <= 1, frame_a=f"a{i}", frame_b=f"b{i}")
+    base = [comp(f"G{i % 20}", f"H{i % 23}", 0.3, i) for i in range(470)]
+
+    def alert(comps):
+        conflicted = sorted({g for c in comps if not c.agree for g in (c.group_a, c.group_b)})
+        _, stats = explain_conflicts(comps)
+        return user_alert(conflicted, stats, len(comps))
+
+    assert alert(base)["level"] == "ok"
+    a = alert(base + [comp("D1", "D2", 1.11, 900)])
+    assert a["level"] == "info" and "hasard" in a["title"]
+    outl = base + [comp("X", f"G{i}", 3.8, 950 + i) for i in range(5)]
+    a = alert(outl)
+    assert a["level"] == "warn" and a["title"] == "Image probablement aberrante" and "X" in a["message"]
+    a = alert(base + [comp("Y", "Z", 3.8, 990)])
+    assert a["level"] == "warn" and "Groupe affiché" in a["message"]
+    assert all(len(x["message"]) < 400 for x in (alert(base), alert(outl)))
+    assert alert([])["title"] == "Groupes non comparables"
+
+
+def test_groups_are_named_g1_g2_not_like_detectors():
+    """« D » est réservé aux détecteurs : les groupes s'appellent G1, G2… (G1 = le plus de
+    passages) ; une image seule n'a pas de numéro."""
+    from app.core.measure import group_labels, group_numbers
+
+    g_long = track(0, 0.0, [0, 180, 365], [0, 1, 2], "D2_1.640", noise=0.0)
+    g_short = track(0, 0.0, [0.1, 180.1], [0, 1], "D5_4.300", noise=0.0, start=10)
+    for m in g_short:
+        m.detector, m.wavelength_um = "D5", 4.3
+    solo = track(0, 0.0, [181], [1], "isolee_X", noise=0.0, start=20)
+    ms = g_long + g_short + solo
+    assert group_numbers(ms) == {"D2_1.640": "G1", "D5_4.300": "G2"}
+    labels = group_labels(ms)
+    assert labels["D2_1.640"] == "le groupe G1 (détecteur D2, 1,50 µm)"
+    assert labels["D5_4.300"].startswith("le groupe G2 (détecteur D5")
+    assert labels["isolee_X"].startswith("l'image seule (détecteur D2")

@@ -110,3 +110,17 @@ def test_irsa_down_falls_back_to_cache():
     r = search_images(target(), refresh=True, sia=down)          # IRSA en panne
     assert r.source == "cache" and r.n_images == 6
     assert "IRSA indisponible" in r.errors[0]
+
+
+def test_transient_irsa_error_is_retried():
+    """IRSA renvoie une erreur 502 passagère : on réessaie et on obtient les images."""
+    calls = {"n": 0}
+
+    def flaky_once(ra, dec, radius, coll):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise ConnectionError("502 Server Error: Proxy Error")
+        return fake_sia(ra, dec, radius, coll)
+
+    r = search_images(target(), sia=flaky_once, refresh=True)
+    assert r.n_images > 0 and not r.errors

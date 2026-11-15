@@ -14,6 +14,11 @@ Usage (serveur lancé dans un autre terminal) :
     python scripts/precompute_front.py
     python scripts/precompute_front.py --only barnards-star epsilon-indi-b
     python scripts/precompute_front.py --base http://localhost:8000
+    python scripts/precompute_front.py --check-updates   # chercher TOUT DE SUITE de nouvelles
+                                                         # images SPHEREx pour toutes les cibles
+
+Mise à jour automatique : le serveur revérifie IRSA chaque semaine tout seul (voir
+/api/updates/status). --check-updates force cette vérification maintenant.
 """
 from __future__ import annotations
 
@@ -64,7 +69,12 @@ def main() -> int:
     ap.add_argument("--base", default="http://localhost:8000")
     ap.add_argument("--only", nargs="*", help="ids de cibles (ex. barnards-star)")
     ap.add_argument("--timeout", type=float, default=3 * 3600, help="secondes par cible")
+    ap.add_argument("--check-updates", action="store_true",
+                    help="vérifier maintenant s'il y a de nouvelles images SPHEREx (toutes cibles)")
     args = ap.parse_args()
+
+    if args.check_updates:
+        return check_updates(args.base)
 
     targets = front_targets()
     if args.only:
@@ -106,6 +116,35 @@ def main() -> int:
 
     print("\nRésumé :")
     print("\n".join(report))
+    return 0
+
+
+def check_updates(base: str) -> int:
+    """Lance la vérification IRSA de toutes les cibles et suit son avancement."""
+    try:
+        req = urllib.request.Request(f"{base}/api/updates/run?force=true", method="POST")
+        urllib.request.urlopen(req, timeout=30).read()
+    except Exception as exc:  # noqa: BLE001
+        print(f"Serveur injoignable sur {base} ({exc}). Lancez d'abord uvicorn.")
+        return 1
+    print("Vérification des nouvelles images SPHEREx lancée (une cible après l'autre)…")
+    seen = set()
+    time.sleep(2)
+    while True:
+        st = json.loads(urllib.request.urlopen(f"{base}/api/updates/status", timeout=60).read())
+        for r in st["results"]:
+            out = r.get("last_outcome")
+            if out and (r["key"], out["at"]) not in seen:
+                seen.add((r["key"], out["at"]))
+                extra = f" (+{out['new_images']} images)" if out.get("new_images") else ""
+                print(f"  {r['target']:<28} {out['outcome']}{extra}")
+        if not st["running"] and not st["updating"]:
+            break
+        time.sleep(5)
+    if st.get("new_collections"):
+        print("\nNouvelle(s) collection(s) SPHEREx sur IRSA : " + ", ".join(st["new_collections"]))
+        print("  -> à ajouter dans COLLECTIONS (backend/app/core/config.py) après vérification.")
+    print("Terminé.")
     return 0
 
 

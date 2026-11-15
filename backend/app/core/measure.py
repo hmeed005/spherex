@@ -351,6 +351,8 @@ class DisplaySequence(BaseModel):
     segments: dict[str, list] = {}   # frame_id -> [indice du bloc, nom du bloc]
     gif: Optional[str] = None
     frames_png: list[str] = []
+    title: str = ""              # vue par groupe : libellé lisible (détecteur, λ, passages…)
+    info: dict = {}              # vue par groupe : détecteur, λ, dates, mouvement de ce groupe seul
 
 
 class DisplayPlan(BaseModel):
@@ -359,6 +361,10 @@ class DisplayPlan(BaseModel):
     sequences: list[DisplaySequence]
     side_by_side: list[dict] = []   # images comparées aux instants de désaccord
     summary: str
+    # une vidéo PAR groupe (même détecteur, λ à ±3 %) : l'utilisateur choisit le groupe à
+    # regarder ; la vue par défaut reste « tous les groupes » (sequences[0])
+    group_sequences: list["DisplaySequence"] = []
+    alert: Optional[dict] = None    # message court pour l'utilisateur : {level, title, message}
 
 
 def _mean_pos(ms: list[PositionMeasure], scale: float = 1.0):
@@ -420,6 +426,216 @@ def calibrated_sigma_scale(motion: "MotionResult") -> float:
     return float(min(max(1.0, np.sqrt(r.chi2_red)), 5.0))
 
 
+MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre",
+        "octobre", "novembre", "décembre"]
+
+
+def fr_date(iso: Optional[str]) -> str:
+    """'2026-03-11...' -> '11 mars 2026'."""
+    if not iso or len(iso) < 10:
+        return iso or "?"
+    y, mth, d = iso[:4], int(iso[5:7]), int(iso[8:10])
+    return f"{'1er' if d == 1 else d} {MOIS[mth - 1]} {y}"
+
+
+def fr_month(iso: Optional[str]) -> str:
+    """'2026-03-11...' -> 'mars 2026' (un passage s'étale sur plusieurs jours)."""
+    if not iso or len(iso) < 7:
+        return iso or "?"
+    return f"{MOIS[int(iso[5:7]) - 1]} {iso[:4]}"
+
+
+def fr_num(x: float, nd: int = 2) -> str:
+    return f"{x:.{nd}f}".replace(".", ",")
+
+
+def group_numbers(measures: list[PositionMeasure]) -> dict[str, str]:
+    """Numéro affiché de chaque groupe d'au moins 2 images : G1, G2… (« D » est réservé aux
+    détecteurs). Même ordre que les vues par groupe : plus de passages, puis plus longue durée."""
+    by_g: dict[str, list[PositionMeasure]] = {}
+    for m in measures:
+        by_g.setdefault(pseudo_group(m), []).append(m)
+    ranked = []
+    for g, ms in by_g.items():
+        if g.startswith("isolee_") or len(ms) < 2:
+            continue
+        visits = {m.visit if m.visit is not None else round(m.mjd) for m in ms}
+        span = max(m.mjd for m in ms) - min(m.mjd for m in ms)
+        ranked.append((-len(visits), -span, g))
+    return {g: f"G{k}" for k, (_, _, g) in enumerate(sorted(ranked), 1)}
+
+
+def group_labels(measures: list[PositionMeasure]) -> dict[str, str]:
+    """Nom lisible de chaque groupe : « le groupe G2 (détecteur D2, 1,64 µm) » ;
+    image isolée : « l'image seule (détecteur D3, 1,78 µm) du 25 mars 2026 »."""
+    nums = group_numbers(measures)
+    by_g: dict[str, list[PositionMeasure]] = {}
+    for m in measures:
+        by_g.setdefault(pseudo_group(m), []).append(m)
+    out = {}
+    for g, ms in by_g.items():
+        det = ms[0].detector or "?"
+        wls = [m.wavelength_um for m in ms if m.wavelength_um]
+        wl = f", {fr_num(float(np.median(wls)))} µm" if wls else ""
+        if g in nums:
+            out[g] = f"le groupe {nums[g]} (détecteur {det}{wl})"
+        else:
+            out[g] = f"l'image seule (détecteur {det}{wl}) du {fr_date(ms[0].date_utc)}"
+    return out
+
+
+def conflict_sigma(n_comparisons: int, false_alarm: float = 0.05) -> float:
+    """Seuil (en σ) pour qu'au total moins de 5 % de chances d'un faux désaccord."""
+    if n_comparisons <= 0:
+        return 3.0
+    return max(3.0, float(np.sqrt(2 * np.log(n_comparisons / false_alarm))))
+
+
+def explain_conflicts(comps: list[GroupComparison],
+                      labels: Optional[dict[str, str]] = None) -> tuple[dict[str, str], dict]:
+    """Remarques sur les désaccords (n'influencent PAS l'affichage : tout groupe impliqué
+    dans un dépassement de 3σ reste montré à part, règle d'origine). Elles disent à
+    l'utilisateur de quel type de désaccord il s'agit :
+      - groupe en désaccord avec la plupart des autres -> image probablement aberrante ;
+      - groupe en désaccord seulement avec un tel groupe -> il concorde avec tous les autres ;
+      - écart au-delà du seuil corrigé du nombre de comparaisons -> décalage net ;
+      - sinon -> compatible avec le hasard (≈ 1 % des comparaisons dépassent 3σ par hasard)."""
+    n = len(comps)
+    k = conflict_sigma(n)
+    expected = n * float(np.exp(-4.5))           # P(écart > 3σ) pour un écart 2D gaussien
+    bad = [c for c in comps if not c.agree]
+    partners: dict[str, set] = {}
+    bad_partners: dict[str, set] = {}
+    for c in comps:
+        partners.setdefault(c.group_a, set()).add(c.group_b)
+        partners.setdefault(c.group_b, set()).add(c.group_a)
+    for c in bad:
+        bad_partners.setdefault(c.group_a, set()).add(c.group_b)
+        bad_partners.setdefault(c.group_b, set()).add(c.group_a)
+    culprits: set[str] = set()
+    while True:
+        best = None
+        for g, ps in partners.items():
+            if g in culprits:
+                continue
+            ps = ps - culprits
+            bads = bad_partners.get(g, set()) - culprits
+            if len(ps) >= 2 and 2 * len(bads) > len(ps):
+                score = (len(bads) / len(ps), len(bads), g)
+                if best is None or score > best:
+                    best = score
+        if best is None:
+            break
+        culprits.add(best[2])
+
+    def other(c, g):
+        return c.group_b if c.group_a == g else c.group_a
+
+    def sig(c):
+        return 3.0 * c.distance_px / c.tolerance_px if c.tolerance_px else float("inf")
+
+    lab = (lambda g: (labels or {}).get(g, g))
+    px = PIXSCALE_ARCSEC
+    # notes[g] = (gravité, explication en langage simple) ; gravité : "warn" | "info"
+    notes: dict[str, tuple[str, str]] = {}
+    for g in sorted({x for c in bad for x in (c.group_a, c.group_b)}):
+        mine = sorted((c for c in bad if g in (c.group_a, c.group_b)), key=sig, reverse=True)
+        w = mine[0]
+        o, date, dist = other(w, g), fr_month(w.date), w.distance_px * px
+        n_part = len(partners.get(g, set()))
+        moi = "cette image" if lab(g).startswith("l'image") else "ce groupe"
+        Moi = moi[0].upper() + moi[1:]
+        le = "la" if moi == "cette image" else "le"
+        if g in culprits:
+            qui = (f"les {n_part} autres groupes" if len(bad_partners.get(g, set())) == n_part
+                   else f"{len(bad_partners.get(g, set()))} des {n_part} autres groupes")
+            notes[g] = ("warn",
+                        f"Au même passage, {moi} place l'étoile à {dist:.0f}″ de l'endroit où la voient "
+                        f"{qui}. Elle est donc probablement défectueuse (artefact, rayon cosmique ou "
+                        "étoile voisine). On la montre quand même, à part, pour ne rien cacher.")
+        elif all(other(c, g) in culprits for c in mine):
+            notes[g] = ("info",
+                        f"{Moi} est d'accord avec tous les autres groupes. {'Elle' if le == 'la' else 'Il'} "
+                        f"est montré{'e' if le == 'la' else ''} à part seulement parce "
+                        f"qu'{'elle' if le == 'la' else 'il'} ne concorde pas avec {lab(o)}, une image probablement défectueuse "
+                        f"({dist:.0f}″ d'écart lors du passage de {date}).")
+        elif sig(w) <= k:
+            notes[g] = ("info",
+                        f"Lors du passage de {date}, {moi} et {lab(o)} placent l'étoile à {dist:.0f}″ l'un "
+                        f"de l'autre (environ {fr_num(w.distance_px, 1)} pixel). Pour ne rien cacher, on {le} "
+                        "montre à "
+                        f"part. Mais cet écart est petit : sur {n} comparaisons, environ "
+                        f"{expected:.0f} écarts comme celui-ci arrivent par hasard. "
+                        "La trajectoire reste fiable.")
+        else:
+            notes[g] = ("warn",
+                        f"Lors du passage de {date}, {moi} et {lab(o)} placent l'étoile à {dist:.0f}″ l'un "
+                        "de l'autre : "
+                        "c'est un écart net, trop grand pour être dû au hasard. Comparez les deux groupes "
+                        "avec « Groupe affiché » pour juger (artefact, étoile voisine ou effet de la "
+                        "longueur d'onde ?).")
+    clear = sorted((c for c in bad if sig(c) > k), key=sig, reverse=True)
+    outlier_details = []
+    for g in sorted(culprits):
+        cs = [c for c in clear if g in (c.group_a, c.group_b)] or \
+             [c for c in bad if g in (c.group_a, c.group_b)]
+        if cs:
+            c = max(cs, key=sig)
+            outlier_details.append(dict(group=g, date=c.date, distance_px=c.distance_px,
+                                        n_bad=len(bad_partners.get(g, set())),
+                                        n_partners=len(partners.get(g, set()))))
+    clear_pairs = [dict(group_a=c.group_a, group_b=c.group_b, date=c.date, distance_px=c.distance_px,
+                        sigma=round(sig(c), 1))
+                   for c in clear if not ({c.group_a, c.group_b} & culprits)]
+    stats = dict(n_comparisons=n, n_over_3sigma=len(bad), expected_by_chance=round(expected, 1),
+                 corrected_sigma=round(k, 2), n_clear=len(clear), likely_outliers=sorted(culprits),
+                 outlier_details=outlier_details, clear_pairs=clear_pairs)
+    return notes, stats
+
+
+def user_alert(conflicted: list[str], stats: dict, n_comparisons: int,
+               labels: Optional[dict[str, str]] = None) -> Optional[dict]:
+    """Message court et clair pour l'utilisateur (zone à droite de la vidéo).
+    level : ok | info | warn."""
+    px = PIXSCALE_ARCSEC
+    if n_comparisons == 0:
+        return dict(level="info", title="Groupes non comparables",
+                    message="Aucun passage n'est commun à deux groupes : on ne peut pas vérifier "
+                            "qu'ils donnent la même position. Regardez chaque groupe séparément "
+                            "avec « Groupe affiché ».")
+    if not conflicted:
+        return dict(level="ok", title="Groupes concordants",
+                    message="Tous les groupes placent l'objet au même endroit aux mêmes instants : "
+                            "la trajectoire affichée est fiable.")
+    if stats["n_clear"] == 0:
+        return dict(level="info", title="Petits écarts dus au hasard",
+                    message=f"Sur {n_comparisons} comparaisons entre groupes, {stats['n_over_3sigma']} "
+                            "montrent un petit écart, autant qu'on en attend par hasard "
+                            f"(environ {stats['expected_by_chance']:.0f}). Ces groupes sont rejoués à part "
+                            "à la fin de la vidéo pour ne rien cacher, mais la trajectoire reste fiable.")
+    parts, title = [], "Désaccord entre groupes"
+    if stats["outlier_details"]:
+        title = ("Image probablement aberrante" if not stats["clear_pairs"]
+                 else "Désaccord entre groupes")
+        for o in stats["outlier_details"][:2]:
+            who = (f"les {o['n_partners']} autres groupes" if o["n_bad"] == o["n_partners"]
+                   else f"{o['n_bad']} des {o['n_partners']} autres groupes")
+            name = (labels or {}).get(o["group"], f"l'image {o['group']}")
+            name = name[0].upper() + name[1:]
+            parts.append(f"{name} place l'étoile à {o['distance_px'] * px:.0f}″ de l'endroit où la "
+                         f"voient {who} au même passage : elle est sans doute défectueuse. "
+                         "Elle est rejouée à part à la fin de la vidéo.")
+    if stats["clear_pairs"]:
+        c = stats["clear_pairs"][0]
+        more = (f" ({len(stats['clear_pairs'])} cas)" if len(stats["clear_pairs"]) > 1 else "")
+        la, lb = ((labels or {}).get(c["group_a"], c["group_a"]),
+                  (labels or {}).get(c["group_b"], c["group_b"]))
+        parts.append(f"Lors du passage de {fr_month(c['date'])}, {la} et {lb} placent l'étoile à "
+                     f"{c['distance_px'] * px:.0f}″ l'un de l'autre{more}. Comparez ces groupes avec "
+                     "« Groupe affiché » pour juger (artefact, étoile voisine ou effet de longueur d'onde).")
+    return dict(level="warn", title=title, message=" ".join(parts))
+
+
 def plan_display(measures: list[PositionMeasure], frames_by_id: dict,
                  sigma_scale: float = 1.0) -> DisplayPlan:
     """UNE SEULE vidéo, faite de blocs joués l'un après l'autre (jamais d'alternance) :
@@ -430,6 +646,8 @@ def plan_display(measures: list[PositionMeasure], frames_by_id: dict,
     Le passage d'un bloc au suivant est signalé dans la frise (changement de groupe)."""
     comps = compare_groups(measures, frames_by_id, sigma_scale)
     conflicted = sorted({g for c in comps if not c.agree for g in (c.group_a, c.group_b)})
+    labels = group_labels(measures)
+    explain, stats = explain_conflicts(comps, labels)
     groups_all = sorted({pseudo_group(m) for m in measures})
     agree_edges = {frozenset((c.group_a, c.group_b)) for c in comps if c.agree}
 
@@ -458,44 +676,69 @@ def plan_display(measures: list[PositionMeasure], frames_by_id: dict,
     notes: dict[str, str] = {}
     frame_ids: list[str] = []
     segments: dict[str, tuple[int, str]] = {}
+    n_sep = sum(1 for label, _ in blocks if label.startswith("groupe "))
+    k_sep = 0
     for bi, (label, ms) in enumerate(blocks):
         for j, m in enumerate(ms):
             frame_ids.append(m.frame_id)
             segments[m.frame_id] = (bi, label)
-            if label.startswith("groupe ") and j == 0:
-                bad = [c for c in comps if not c.agree and pseudo_group(m) in (c.group_a, c.group_b)]
-                why = " ; ".join(f"décalage de {c.distance_px:.2f} px avec "
-                                 f"{c.group_b if c.group_a == pseudo_group(m) else c.group_a} "
-                                 f"le {c.date} (seuil {c.tolerance_px:.2f} px)" for c in bad[:3])
-                notes[m.frame_id] = (f"⚠ nouveau bloc : {label} (montré à part car en désaccord : "
-                                     f"{why}). À juger par l'utilisateur.")
+            if j:
+                continue
+            if label.startswith("groupe "):
+                k_sep += 1
+                g = pseudo_group(m)
+                level, why = explain.get(g, ("warn", ""))
+                if bi == 0:
+                    where = ("Les groupes ne sont pas tous d'accord : la vidéo les montre un par un, "
+                             "chacun dans l'ordre des dates.")
+                elif blocks[0][0] == "groupes concordants":
+                    where = ("La date revient en arrière : après la trajectoire commune, on rejoue "
+                             "ce groupe seul.")
+                else:
+                    where = "La date revient en arrière : on passe au groupe suivant, rejoué seul."
+                notes[m.frame_id] = ("⚠ " if level == "warn" else "ℹ ") + (
+                    f"Séquence à part {k_sep}/{n_sep} : {labels.get(g, g)}.\n{where}\n"
+                    f"Pourquoi ? {why}")
+            elif n_sep:
+                notes[m.frame_id] = (
+                    "ℹ La vidéo montre d'abord tous les groupes qui sont d'accord, dans l'ordre des "
+                    f"dates. Ensuite, {n_sep} groupe(s) qui ne sont pas d'accord avec les autres sont "
+                    "rejoués un par un : la date reviendra alors en arrière.")
         # à l'intérieur d'un bloc : passages concordants et raccords non vérifiables
         for prev, cur in zip(ms, ms[1:]):
             ga, gb = pseudo_group(prev), pseudo_group(cur)
             if ga != gb and frozenset((ga, gb)) not in agree_edges and cur.frame_id not in notes:
-                notes[cur.frame_id] = (f"raccord non vérifiable : {ga} -> {gb} "
-                                       "(aucun passage commun pour comparer les positions)")
+                notes[cur.frame_id] = (f"Passage de {labels.get(ga, ga)} à {labels.get(gb, gb)} : "
+                                       "aucune date commune ne permet de vérifier qu'ils voient "
+                                       "l'étoile au même endroit.")
         for m in ms:
             ok = [c for c in comps if c.agree and c.visit == m.visit
                   and pseudo_group(m) in (c.group_a, c.group_b)]
             if ok and m.frame_id not in notes:
                 c = ok[0]
-                notes[m.frame_id] = (f"positions concordantes {c.group_a} / {c.group_b} "
-                                     f"(écart {c.distance_px:.2f} px ≤ {c.tolerance_px:.2f} px) : "
-                                     "image la plus visible affichée")
+                notes[m.frame_id] = (f"À cette date, {labels.get(c.group_a, c.group_a)} et "
+                                     f"{labels.get(c.group_b, c.group_b)} voient l'étoile au même "
+                                     "endroit : on montre l'image la plus nette.")
 
     seq = DisplaySequence(kind="unique", groups=groups_all, frame_ids=frame_ids, notes=notes,
                           segments={fid: list(v) for fid, v in segments.items()})
     sbs = [dict(date=c.date, group_a=c.group_a, group_b=c.group_b, frame_a=c.frame_a,
                 frame_b=c.frame_b, distance_px=c.distance_px, tolerance_px=c.tolerance_px)
            for c in comps if not c.agree]
-    summary = (f"incertitudes calibrées x{sigma_scale:.2f} ; " if sigma_scale > 1 else "") + (
-        "tous les groupes concordent : une image par passage, ordre chronologique"
-        if not conflicted else
-        f"{len(sbs)} désaccord(s) : vidéo en {len(blocks)} blocs joués l'un après l'autre "
-        f"(groupes concordants, puis chaque groupe en désaccord en entier)")
+    if not conflicted:
+        detail = "tous les groupes concordent : une image par passage, ordre chronologique"
+    else:
+        detail = (f"{stats['n_over_3sigma']} écart(s) > 3σ sur {stats['n_comparisons']} comparaisons "
+                  f"(≈ {stats['expected_by_chance']} attendu(s) par hasard ; "
+                  f"{stats['n_clear']} au-delà du seuil corrigé {stats['corrected_sigma']}σ) : "
+                  f"vidéo en {len(blocks)} blocs joués l'un après l'autre (groupes concordants, "
+                  f"puis chaque groupe en désaccord en entier)")
+        if stats["likely_outliers"]:
+            detail += f" ; probablement aberrant(s) : {', '.join(stats['likely_outliers'])}"
+    summary = (f"incertitudes calibrées x{sigma_scale:.2f} ; " if sigma_scale > 1 else "") + detail
     return DisplayPlan(comparisons=comps, conflicted_groups=conflicted,
-                       sequences=[seq] if frame_ids else [], side_by_side=sbs, summary=summary)
+                       sequences=[seq] if frame_ids else [], side_by_side=sbs, summary=summary,
+                       alert=user_alert(conflicted, stats, len(comps), labels))
 
 
 # ----------------------------------------------------------------- rendu
@@ -518,7 +761,9 @@ def clean_crop(shown: list[np.ndarray]) -> int:
 
 
 def _render_sequence(target, seq: DisplaySequence, motion: MotionResult, frames_by_id: dict,
-                     cache: dict, out_dir: Path, tag: str) -> None:
+                     cache: dict, out_dir: Path, tag: str, light: bool = False) -> None:
+    """light=True : seulement la vidéo propre (pas d'images PNG annotées ni de vidéo à
+    repères) — utilisé pour les vues par groupe, pour ne pas multiplier le temps de calcul."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.patches  # noqa: F401
@@ -565,7 +810,7 @@ def _render_sequence(target, seq: DisplaySequence, motion: MotionResult, frames_
     seq_meas = [m for m in motion.measures if pseudo_group(m) in seq.groups]
     t_all = [m.mjd for m in motion.measures if m.used]
     line = ([motion.predict(t) for t in np.linspace(min(t_all), max(t_all), 50)]
-            if motion.t0_mjd is not None and t_all else [])
+            if motion.x0_px is not None and t_all else [])
     cx_, cy_ = line[len(line) // 2] if line else (n / 2, n / 2)
     zh = max(3.0, (np.hypot(line[-1][0] - line[0][0], line[-1][1] - line[0][1]) if line else 0) + 1.5)
 
@@ -580,7 +825,7 @@ def _render_sequence(target, seq: DisplaySequence, motion: MotionResult, frames_
                        {"mfc": "none", "mec": "#999999"}))
 
     rgb, prev_wl, pngs = [], None, []
-    for k, fid in enumerate(chosen):
+    for k, fid in enumerate([] if light else chosen):
         m, f = meas[fid], frames_by_id[fid]
         fig, ax = plt.subplots(figsize=(5.4, 5.4))
         ax.imshow(shown[k], origin="lower", cmap=cmap, norm=norm, extent=extent, interpolation="bilinear")
@@ -616,7 +861,9 @@ def _render_sequence(target, seq: DisplaySequence, motion: MotionResult, frames_
         pngs.append(str(png))
         rgb.append(np.asarray(fig.canvas.buffer_rgba())[..., :3].astype(float))
         plt.close(fig)
-    seq.frames_png = pngs
+    if light:
+        pngs = [None] * len(chosen)
+    seq.frames_png = [p for p in pngs if p]
     # ---- vidéo MP4 + frise temporelle synchronisable (+ sous-titres, GIF de secours)
     from app.core.video import build_video
     entries, prev, prev_seg, prev_label = [], None, None, None
@@ -628,7 +875,7 @@ def _render_sequence(target, seq: DisplaySequence, motion: MotionResult, frames_
         change = (f"λ change ({prev:.2f} → {wl:.2f} µm) : l'éclat peut changer, pas la position"
                   if prev and wl and abs(wl - prev) / prev > 0.03 else None)
         prev = wl or prev
-        pred = motion.predict(m.mjd) if motion.t0_mjd is not None else None
+        pred = motion.predict(m.mjd) if motion.x0_px is not None else None
         entries.append(dict(
             frame_id=fid, date_utc=m.date_utc, detector=f.detector,
             wavelength_um=None if wl is None else round(wl, 4), group=pseudo_group(m),
@@ -642,7 +889,7 @@ def _render_sequence(target, seq: DisplaySequence, motion: MotionResult, frames_
             segment_index=seq.segments.get(fid, [0, ""])[0],
             segment_label=seq.segments.get(fid, [0, ""])[1]))
         prev_seg, prev_label = seq.segments.get(fid, [0, ""])
-    if rgb:
+    if shown:
         # vidéo PROPRE : uniquement l'image du ciel (même contraste pour toutes les dates)
         up = shown[0].shape[0] / n
         c0 = clean_crop(shown)                           # pas de coins vides (découpe tournée)
@@ -653,15 +900,23 @@ def _render_sequence(target, seq: DisplaySequence, motion: MotionResult, frames_
             rgba = cmap(norm(sub))
             ok = np.isfinite(sub)[..., None]
             clean.append((np.where(ok, rgba[..., :3], 0.0) * 255).astype(np.uint8))
+        # une image fixe PROPRE par date (la même que dans la vidéo : nord en haut, sans coins
+        # vides, sans repère ni médaillon) -> utilisée par « Compare 2 Dates »
+        import matplotlib.image as mpimg
+        for k, (img, e) in enumerate(zip(clean, entries)):
+            still = out_dir / f"{tag}_date_{k:02d}.png"
+            mpimg.imsave(still, img)
+            e["image_url"] = str(still)
         seq.video = build_video(clean, entries, out_dir / tag, loop_back=len(clean) > 1,
                                 make_gif=MAKE_GIF)
         seq.video.grid_size_px = n
         seq.video.px_scale = round(float(up), 4)
         seq.video.crop_px = int(c0)
         # variante avec repères dessinés (positions, trajectoire), toujours sans texte
-        mk = build_video(rgb, entries, out_dir / f"{tag}_reperes", loop_back=len(rgb) > 1,
-                         make_gif=False, make_vtt=False)
-        seq.video.mp4_markers = mk.mp4
+        if rgb:
+            mk = build_video(rgb, entries, out_dir / f"{tag}_reperes", loop_back=len(rgb) > 1,
+                             make_gif=False, make_vtt=False)
+            seq.video.mp4_markers = mk.mp4
         seq.gif = seq.video.gif
 
 
@@ -705,6 +960,47 @@ def _render_side_by_side(item: dict, cache: dict, frames_by_id: dict, measures: 
     return str(path)
 
 
+def group_views(motion: MotionResult, frames_by_id: dict,
+                conflicted: Optional[list[str]] = None) -> list[tuple[DisplaySequence, MotionResult]]:
+    """Une séquence par groupe : toutes ses images, dans l'ordre chronologique, avec le
+    mouvement mesuré sur CE groupe seul (positions brutes, aucune correction).
+    Rangées comme les groupes : plus de passages, puis plus longue durée ; isolées à la fin."""
+    nums = group_numbers(motion.measures)
+    by_g: dict[str, list[PositionMeasure]] = {}
+    for m in motion.measures:
+        by_g.setdefault(pseudo_group(m), []).append(m)
+    out = []
+    for g, ms in by_g.items():
+        ms = sorted(ms, key=lambda m: m.mjd)
+        visits = {m.visit if m.visit is not None else round(m.mjd) for m in ms}
+        fit = fit_motion([m.model_copy() for m in ms], with_offsets=False)
+        wls = [m.wavelength_um for m in ms if m.wavelength_um]
+        det = sorted({m.detector for m in ms if m.detector})
+        span = ms[-1].mjd - ms[0].mjd
+        info = dict(group=g, number=nums.get(g), detector=", ".join(det) or None,
+                    wavelength_um=round(float(np.median(wls)), 4) if wls else None,
+                    n_images=len(ms), n_passages=len(visits),
+                    date_start=ms[0].date_utc, date_end=ms[-1].date_utc, span_days=round(span, 1),
+                    in_disagreement=bool(conflicted and g in conflicted),
+                    mu_arcsec_yr=fit.mu_arcsec_yr, mu_err_arcsec_yr=fit.mu_err_arcsec_yr,
+                    position_angle_deg=fit.position_angle_deg,
+                    motion_status=fit.status, motion_reason=fit.status_reason)
+        wl_txt = f"{info['wavelength_um']:.2f} µm" if info["wavelength_um"] else "λ ?"
+        if fit.mu_arcsec_yr is not None and len(visits) >= 2:
+            mu_txt = f"{fit.mu_arcsec_yr:.1f}″/an" + (f" ± {fit.mu_err_arcsec_yr:.1f}"
+                                                      if fit.mu_err_arcsec_yr else "")
+        else:
+            mu_txt = "1 passage : pas de mouvement mesurable" if len(visits) < 2 else fit.status
+        title = (f"{nums.get(g, 'Image seule')} · {info['detector'] or '?'} · {wl_txt} · {len(visits)} passage(s) · "
+                 f"{ms[0].date_utc[:7]} → {ms[-1].date_utc[:7]} · {mu_txt}")
+        seq = DisplaySequence(kind="groupe", groups=[g], frame_ids=[m.frame_id for m in ms],
+                              segments={m.frame_id: [0, f"groupe {g}"] for m in ms},
+                              title=title, info=info)
+        out.append(((len(visits), span, not g.startswith("isolee_")), seq, fit))
+    out.sort(key=lambda t: (t[0][2], t[0][0], t[0][1]), reverse=True)
+    return [(seq, fit) for _, seq, fit in out]
+
+
 def render_display(target, motion: MotionResult, plan: DisplayPlan, frames_by_id: dict,
                    cache: dict, out_dir: Path) -> DisplayPlan:
     import shutil
@@ -721,6 +1017,14 @@ def render_display(target, motion: MotionResult, plan: DisplayPlan, frames_by_id
                     reverse=True)
     for k, item in enumerate(ranked[:MAX_SIDE_BY_SIDE]):
         item["png"] = _render_side_by_side(item, cache, frames_by_id, meas, out_dir, k)
+    # une vidéo par groupe (rendu léger : vidéo propre seulement)
+    plan.group_sequences = []
+    for gi, (seq, fit) in enumerate(group_views(motion, frames_by_id, plan.conflicted_groups)):
+        if not fit.measures:
+            continue
+        _render_sequence(target, seq, fit, frames_by_id, cache, out_dir, f"groupe_{gi:02d}", light=True)
+        if seq.video:
+            plan.group_sequences.append(seq)
     return plan
 
 

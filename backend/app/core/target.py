@@ -30,8 +30,13 @@ MISSION_SPAN_YR = 1.5
 DEMO_TARGETS = {
     "barnard": dict(label="Étoile de Barnard", ra=269.452076, dec=4.693364,
                     pmra=-801.551, pmdec=10362.394),
-    "wise 0855-0714": dict(label="WISE 0855-0714", ra=133.786245, dec=-7.244372,
-                           pmra=-8118.0, pmdec=673.0),
+    # WISE 0855 : position mesurée par HST/WFC3 le 2015-03-03 (MJD 57084.818, Zapatero
+    # Osorio et al. 2016), 08h55m08.248s -07°14'39.29", donc ÉPOQUE 2015.17 et non J2000.
+    # (L'ancienne valeur, ~époque 2015 mais traitée comme J2000, décalait la zone de ~2'
+    # en 2025 : l'objet tombait hors de l'ouverture -> « invisible » sur toutes les images.)
+    # Mouvement propre : -8123.7 / +673.2 mas/an (Kirkpatrick et al. 2021).
+    "wise 0855-0714": dict(label="WISE 0855-0714", ra=133.784367, dec=-7.244247,
+                           pmra=-8123.7, pmdec=673.2, epoch=2015.168),
     "nep": dict(label="Pôle nord écliptique", ra=270.0, dec=66.560708,
                 pmra=0.0, pmdec=0.0),
     # ε Indi Ba/Bb (naines brunes) : 2MASS J22041052-5646577, à ~6.7' de ε Indi A.
@@ -132,11 +137,12 @@ def resolve_target(req: TargetRequest) -> Target:
     # de la mission SPHEREx (et non à J2000, où il n'est plus).
     if pmra and pmdec and math.hypot(pmra, pmdec) > 100:  # > 0,1"/an
         moving = SkyCoord(ra=coord.ra, dec=coord.dec, pm_ra_cosdec=pmra * u.mas / u.yr,
-                          pm_dec=pmdec * u.mas / u.yr, obstime=Time(CATALOG_EPOCH, format="jyear"),
+                          pm_dec=pmdec * u.mas / u.yr,
+                          obstime=Time(extra.get("epoch", CATALOG_EPOCH), format="jyear"),
                           frame="icrs")
         coord = moving.apply_space_motion(new_obstime=Time(MISSION_MID_EPOCH, format="jyear"))
         warnings.append(f"Zone centrée sur la position de l'objet en {MISSION_MID_EPOCH} "
-                        f"(propagée depuis J{CATALOG_EPOCH} avec son mouvement propre).")
+                        f"(propagée depuis {extra.get('epoch', CATALOG_EPOCH)} avec son mouvement propre).")
 
     ra = float(coord.ra.wrap_at(360 * u.deg).deg)   # RA toujours dans [0, 360[
     dec = float(coord.dec.deg)

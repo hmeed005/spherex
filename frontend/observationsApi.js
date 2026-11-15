@@ -32,7 +32,9 @@
   ).replace(/\/+$/, "");
   const MAX_FOV_ARCMIN = 12;          // limite du backend (size_arcmin entre 1 et 12)
   const DEMO_SIZE_ARCMIN = 6;         // taille précalculée par run_all (défaut du backend)
-  const TIMEOUT_MS = 10 * 60 * 1000;  // 1er calcul d'une cible : peut prendre plusieurs minutes
+  // 1er calcul d'une cible : de quelques minutes à plus d'une demi-heure (téléchargements IRSA).
+  // On attend jusqu'à 1 h ; le serveur continue de toute façon et met le résultat en cache.
+  const TIMEOUT_MS = 60 * 60 * 1000;
   // Cibles démo connues du backend (position corrigée du mouvement propre)
   const KNOWN_TARGETS = [
     [/barnard/i, "barnard"],
@@ -63,11 +65,8 @@
     const parts = [];
     if (e.detector) parts.push(e.detector);
     if (typeof e.wavelength_um === "number") parts.push(`${e.wavelength_um.toFixed(3)} µm`);
-    let txt = parts.join(" · ");
-    // Changement de groupe signalé directement dans la case affichée par le frontend
-    if (e.group_changed) txt += `  ⚠ nouveau groupe : ${e.segment_label || e.group || ""}`;
-    else if (e.disagreement) txt += `  • ${e.segment_label || e.group || ""}`;
-    return txt;
+    // (les désaccords / changements de groupe sont affichés à droite, pas sous la vidéo)
+    return parts.join(" · ");
   }
 
   // ---- requêtes en cours (une seule par URL) et compteur de progression unique
@@ -83,6 +82,11 @@
 
   // Un seul compteur à la fois : celui de la cible affichée (sinon plusieurs
   // compteurs écrivent dans la même case et le temps « saute »).
+  function fmtElapsed(s) {
+    const m = Math.floor(s / 60);
+    return m ? `${m} min ${String(s % 60).padStart(2, "0")} s` : `${s} s`;
+  }
+
   function showProgress(label, t0, url) {
     stopProgress();
     progressUrl = url;
@@ -91,8 +95,9 @@
       if (!statusEl || !statusEl.classList.contains("loading")) return;
       const s = Math.round((Date.now() - t0) / 1000);
       statusEl.textContent =
-        `Calcul SPHEREx en cours pour ${label}… ${s} s ` +
-        `(le premier calcul d'une cible peut prendre plusieurs minutes, ensuite c'est instantané)`;
+        `Calcul SPHEREx en cours pour ${label}… ${fmtElapsed(s)} ` +
+        `(premier calcul : téléchargement des images depuis IRSA, plusieurs minutes ; ` +
+        `ensuite c'est instantané). Vous pouvez laisser la page ouverte.`;
     };
     tick();
     progressTimer = setInterval(tick, 1000);
@@ -103,9 +108,12 @@
     const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
     let res;
     try {
-      res = await fetch(url, { signal: ctrl.signal });
+      res = await fetch(url, { signal: ctrl.signal, cache: "no-store" });   // toujours la dernière version
     } catch (err) {
-      if (err.name === "AbortError") throw new Error("Le backend met trop de temps à répondre.");
+      if (err.name === "AbortError") {
+        throw new Error("Le calcul continue sur le serveur. Recliquez sur la cible dans quelques " +
+                        "minutes : le résultat s'affichera dès qu'il sera prêt.");
+      }
       throw new Error(`Backend injoignable (${API_BASE}). Le serveur est-il lancé ?`);
     } finally {
       clearTimeout(timer);
@@ -113,7 +121,19 @@
     if (!res.ok) {
       let detail = "";
       try { detail = JSON.stringify((await res.json()).detail); } catch (_) {}
-      throw new Error(`Erreur backend ${res.status} ${detail}`);
+      console.warn("Réponse du backend", res.status, detail);   // détail technique : console
+      if (res.status === 502 || res.status === 503 || res.status === 504 ||
+          /IRSA|Proxy Error|Server Error/i.test(detail)) {
+        throw new Error("Le service de la NASA qui fournit les images SPHEREx (IRSA) ne répond pas " +
+                        "en ce moment. Ce n'est pas un problème du site : réessayez dans quelques " +
+                        "minutes. Les cibles déjà calculées restent disponibles.");
+      }
+      if (res.status === 422) {
+        throw new Error("Coordonnées ou paramètres refusés par le serveur : vérifiez RA (0 à 360) " +
+                        "et Dec (-90 à +90).");
+      }
+      throw new Error(`Le serveur a rencontré une erreur (${res.status}). Réessayez ; si elle ` +
+                      "revient, regardez la fenêtre du serveur.");
     }
     return res.json();
   }
@@ -169,11 +189,44 @@
     } finally {
       if (progressUrl === url) stopProgress();
     }
-    const seq = data?.display?.sequences?.[0];
+    const fovLabel = `${size} arcmin`;
+    const allView = toView(data?.display?.sequences?.[0], fovLabel, {
+      id: "all",
+      title: "Tous les groupes (trajectoire complète)",
+    });
+    // une vue par groupe (même détecteur, λ à ±3 %), choisie par l'utilisateur
+    // seulement les groupes qui ont une vraie vidéo (au moins 2 images)
+    const groupViews = (data?.display?.group_sequences || [])
+      .map((sq) => toView(sq, fovLabel, { id: sq.groups?.[0], title: sq.title, info: sq.info }))
+      .filter((v) => v.frames.length >= 2);
+    const views = [allView, ...groupViews].filter((v) => v.frames.length);
+
+    return {
+      frames: allView.frames,
+      video: allView.video,
+      views,
+      alert: data?.display?.alert || null,   // message court sur l'accord entre groupes
+      targetLabel: data?.target_label || target?.name || "",
+      summary: data?.display?.summary || "",
+      motion: data?.motion || null,
+      // fraîcheur des données (mise à jour automatique hebdomadaire côté serveur)
+      update: data?.update || null,
+      resultKey: data?.result_key || null,
+      raw: data,
+    };
+  }
+
+  /* État des mises à jour automatiques (nouvelles images SPHEREx publiées sur IRSA). */
+  async function fetchUpdateStatus() {
+    const res = await fetch(`${API_BASE}/api/updates/status`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+
+  // Une séquence du backend (vidéo + frise) -> { id, title, info, frames, video }
+  function toView(seq, fovLabel, meta) {
     const video = seq?.video;
     const timeline = video?.timeline || [];
-    const fovLabel = `${size} arcmin`;
-
     const frames = timeline.map((e) => ({
       date: formatDate(e.date_utc),
       band: formatBand(e),
@@ -199,12 +252,9 @@
       status: e.status,
       snr: e.snr,
     }));
-
     return {
+      ...meta,
       frames,
-      targetLabel: data?.target_label || target?.name || "",
-      summary: data?.display?.summary || "",
-      motion: data?.motion || null,
       video: video
         ? {
             mp4: absUrl(video.mp4),
@@ -216,7 +266,6 @@
             height: video.height,
           }
         : null,
-      raw: data,
     };
   }
 
@@ -232,5 +281,5 @@
     return idx;
   }
 
-  window.ObservationsApi = { fetchObservations, indexAtTime, API_BASE };
+  window.ObservationsApi = { fetchObservations, fetchUpdateStatus, indexAtTime, API_BASE };
 })();

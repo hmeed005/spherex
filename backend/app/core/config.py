@@ -21,4 +21,13 @@ IRSA_TIMEOUT = int(os.getenv("IRSA_TIMEOUT", "180"))
 # true = n'utiliser que le cache, aucune requête externe (pour la démo)
 DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
 
+# --- Mise à jour automatique : SPHEREx publie de nouvelles images sur IRSA chaque semaine.
+# Le serveur revérifie IRSA pour chaque résultat déjà calculé tous les UPDATE_EVERY_DAYS jours
+# et ne recalcule que s'il y a de nouvelles images (sans jamais faire attendre le site).
+AUTO_UPDATE = os.getenv("SPHEREX_AUTO_UPDATE", "true").lower() == "true" and not DEMO_MODE
+UPDATE_EVERY_DAYS = float(os.getenv("SPHEREX_UPDATE_EVERY_DAYS", "7"))
+UPDATE_CHECK_HOURS = float(os.getenv("SPHEREX_UPDATE_CHECK_HOURS", "6"))     # tour de vérification
+UPDATE_START_DELAY_S = float(os.getenv("SPHEREX_UPDATE_START_DELAY_S", "60"))
+UPDATE_RETRY_MINUTES = float(os.getenv("SPHEREX_UPDATE_RETRY_MINUTES", "60"))  # si IRSA en panne
+
 CACHE_DIR.mkdir(parents=True, exist_ok=True)

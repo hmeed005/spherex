@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SPHEREx 3D Universe — Multi-Galaxy Astrometry &amp; Real-Time Trajectories</title>
+  <title>SPHEREx 3D Universe — Astrometry &amp; Real-Time Trajectories</title>
   <link rel="stylesheet" href="css.css" />
 </head>
 <body>
@@ -61,19 +61,8 @@
           </div>
         </section>
 
-        <!-- SPHEREx Target Galaxies Selector -->
-        <section class="galaxy-switcher-box" aria-label="SPHEREx Target Galaxies">
-          <div class="switcher-header">
-            <span>SPHEREx TARGET GALAXIES</span>
-            <span id="active-galaxy-dist" class="switcher-dist">3D Space</span>
-          </div>
-          <div id="galaxy-selector-strip" class="galaxy-pill-grid" role="tablist" aria-label="Select Galaxy">
-            <!-- Populated dynamically by app.js -->
-          </div>
-        </section>
-
         <div class="sidebar-legend-mini">
-          <span id="catalog-section-title">3D DWARFS &amp; SOURCES</span>
+          <span id="catalog-section-title">OBJETS À SUIVRE</span>
           <span>Velocity (km/s)</span>
         </div>
 
@@ -90,6 +79,16 @@
       <!-- True 3D Projected Universe, Multi-Galaxy Disks, Dust Lanes & Trajectories Canvas -->
       <canvas id="sky-canvas" aria-label="Interactive 3D Galactic Universe"></canvas>
 
+      <!-- Animation d'ouverture : arrivée depuis le fond de l'espace -->
+      <div id="intro-overlay" class="intro-overlay is-hidden" aria-hidden="true">
+        <div class="intro-title">
+          <div class="intro-eyebrow">NASA SPACE APPS 2026 · PLANET X &amp; SPHEREx</div>
+          <div class="intro-main">SPHEREx</div>
+          <div class="intro-sub">Voyage vers l'univers local…</div>
+        </div>
+        <button id="intro-skip" type="button" class="intro-skip">Passer ▸</button>
+      </div>
+
       <!-- Synchronized 3D-Projected SVG Overlay for Interactive Trajectory Labels & Clicks -->
       <svg id="trajectory-overlay" class="trajectory-overlay" aria-hidden="true">
         <g id="trajectory-camera-group"></g>
@@ -104,11 +103,6 @@
             <kbd>Esc</kbd>
           </button>
 
-          <button id="open-anim-modal-btn" type="button" class="anim-launch-btn is-hidden" title="Open 3D Dwarf Trajectory & Follow-Zoom Pop-up">
-            <span aria-hidden="true">🎬</span>
-            <span>3D Trajectory &amp; Speed</span>
-          </button>
-
           <button id="open-compare-modal-btn" type="button" class="compare-launch-btn" title="Open F2 Two-Date Side-by-Side Observation Comparison">
             <span aria-hidden="true">⇄</span>
             <span>2-Date Compare</span>
@@ -119,37 +113,41 @@
           <div class="coord-inputs">
             <label class="field-group" title="Right Ascension: 0 to 360 degrees">
               <span>RA (°)</span>
-              <input id="ra-input" type="number" min="0" max="360" step="any" placeholder="0 – 360" required />
+              <input id="ra-input" type="text" inputmode="decimal" lang="en" placeholder="0 – 360" required />
             </label>
 
             <label class="field-group" title="Declination: -90 to +90 degrees">
               <span>Dec (°)</span>
-              <input id="dec-input" type="number" min="-90" max="90" step="any" placeholder="-90 – +90" required />
+              <input id="dec-input" type="text" inputmode="decimal" lang="en" placeholder="-90 – +90" required />
             </label>
 
-            <label class="field-group compact" title="Field of View in arcminutes (e.g. 10 arcminutes)">
+            <label class="field-group fov-group" title="Champ de vue : taille de la zone autour de la cible, de 1 à 12 minutes d'arc">
               <span>FOV</span>
-              <select id="fov-select">
+              <!-- liste de valeurs + « Autre… » pour taper sa propre valeur -->
+              <select id="fov-preset">
+                <option value="2">2 arcmin</option>
+                <option value="3">3 arcmin</option>
+                <option value="4">4 arcmin</option>
                 <option value="5">5 arcmin</option>
+                <option value="6">6 arcmin</option>
+                <option value="8">8 arcmin</option>
                 <option value="10" selected>10 arcmin</option>
-                <option value="15">15 arcmin</option>
-                <option value="30">30 arcmin</option>
+                <option value="12">12 arcmin</option>
+                <option value="custom">✎ Autre…</option>
               </select>
+              <!-- valeur réellement utilisée (lue par le code) ; visible seulement pour « Autre… » -->
+              <input id="fov-select" class="fov-custom is-hidden" type="text" inputmode="decimal" lang="en"
+                     value="10" placeholder="1 – 12" aria-label="FOV en minutes d'arc" />
+              <span class="fov-unit is-hidden">arcmin</span>
             </label>
 
-            <label class="field-group compact" title="SPHEREx 102 infrared channels (0.75 to 5.0 µm)">
-              <span>Band</span>
-              <select id="detector-select">
-                <option value="All 102 Ch (0.75–5.0 µm)" selected>All 102 Ch (0.75–5.0 µm)</option>
-                <option value="Band 1 (0.75–1.11 µm)">Band 1 (0.75–1.11 µm)</option>
-                <option value="Band 2 (1.11–1.64 µm)">Band 2 (1.11–1.64 µm)</option>
-                <option value="Band 3 (1.64–2.42 µm)">Band 3 (1.64–2.42 µm)</option>
-                <option value="Band 4 (2.42–3.82 µm)">Band 4 (2.42–3.82 µm)</option>
-                <option value="Band 5 (3.82–4.42 µm)">Band 5 (3.82–4.42 µm)</option>
-                <option value="Band 6 (4.42–5.00 µm)">Band 6 (4.42–5.00 µm)</option>
-              </select>
-            </label>
 
+
+          </div>
+          <!-- à droite : choix de la bande + grand bouton -->
+          <div class="coord-right">
+            <!-- Band retiré de l'interface : toutes les bandes sont utilisées -->
+            <input id="detector-select" type="hidden" value="All 102 Ch (0.75–5.0 µm)" />
             <button type="submit" class="track-btn">⌖ Track 3D</button>
           </div>
         </form>
@@ -206,7 +204,6 @@
           <span id="tooltip-name" class="tooltip-title"></span>
           <span id="tooltip-spec" class="tooltip-spec"></span>
         </div>
-        <div id="tooltip-galaxy" class="tooltip-galaxy"></div>
         <div id="tooltip-type" class="tooltip-sub"></div>
         <div id="tooltip-coords" class="tooltip-coords"></div>
         <div id="tooltip-metrics" class="tooltip-metrics"></div>
@@ -222,7 +219,6 @@
           <div>
             <div class="insp-meta-row">
               <span id="insp-badge" class="insp-tag">Brown Dwarf</span>
-              <span id="insp-flag" class="insp-flag">FLAGS: 0x00</span>
             </div>
             <h2 id="insp-title">WISE 0855</h2>
             <div id="insp-designation" class="insp-designation">WISE J085510.83−071442.5</div>
@@ -230,12 +226,8 @@
           <button id="close-inspector" type="button" class="close-btn" title="Return to 3D Overview (Esc)">✕</button>
         </div>
 
-        <!-- Action Buttons: 3D Trajectory Pop-up + F2 2-Date Comparison -->
+        <!-- Action Button: F2 2-Date Comparison (pop-up « 3D Trajectory » retiré) -->
         <div class="inspector-action-pair">
-          <button id="inspector-anim-trigger" type="button" class="inspector-anim-btn">
-            <span>🎬 3D Trajectory Pop-up</span>
-            <span aria-hidden="true">↗</span>
-          </button>
           <button id="inspector-compare-trigger" type="button" class="inspector-compare-btn">
             <span>⇄ Compare 2 Dates</span>
             <span aria-hidden="true">↗</span>
@@ -245,130 +237,24 @@
         <!-- 2-3 Sentence Descriptive Paragraph -->
         <p id="insp-summary" class="insp-summary"></p>
 
-        <!-- Section 1: 3D Identity & Astrometry -->
+        <!-- Vidéo SPHEREx de la cible (données réelles) -->
         <section class="detail-section">
-          <h3 class="section-heading">3D IDENTITY &amp; ASTROMETRY</h3>
-          <dl class="detail-dl">
-            <div class="dl-row">
-              <dt>Host Galaxy</dt>
-              <dd id="det-galaxy">—</dd>
-            </div>
-            <div class="dl-row">
-              <dt>Classification</dt>
-              <dd id="det-type">—</dd>
-            </div>
-            <div class="dl-row">
-              <dt>Spectral Type</dt>
-              <dd id="det-spectral">—</dd>
-            </div>
-            <div class="dl-row">
-              <dt>Constellation</dt>
-              <dd id="det-constellation">—</dd>
-            </div>
-            <div class="dl-row">
-              <dt>ICRS RA / Dec</dt>
-              <dd id="det-coords">—</dd>
-            </div>
-            <div class="dl-row">
-              <dt>3D Vector (X, Y, Z)</dt>
-              <dd id="det-xyz-3d">—</dd>
-            </div>
-          </dl>
-        </section>
-
-        <!-- Section 2: Physical Properties -->
-        <section class="detail-section">
-          <h3 class="section-heading">PHYSICAL PROPERTIES</h3>
-          <div class="telemetry-grid">
-            <div class="tele-cell">
-              <span class="tele-label">EFFECTIVE TEMP</span>
-              <span id="det-temp" class="tele-val">—</span>
-            </div>
-            <div class="tele-cell">
-              <span class="tele-label">DISTANCE</span>
-              <span id="det-dist-km" class="tele-val">—</span>
-              <span id="det-dist-ly" class="tele-sub">—</span>
-            </div>
-            <div class="tele-cell">
-              <span class="tele-label">MASS</span>
-              <span id="det-mass" class="tele-val">—</span>
-            </div>
-            <div class="tele-cell">
-              <span class="tele-label">RADIUS</span>
-              <span id="det-radius" class="tele-val">—</span>
-            </div>
-            <div class="tele-cell full-span">
-              <span class="tele-label">ESTIMATED AGE / STAGE</span>
-              <span id="det-age" class="tele-val">—</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Section 3: Real-Time 3D Orbit & Trajectory Kinematics -->
-        <section class="detail-section">
-          <h3 class="section-heading">3D REAL-TIME KINEMATICS</h3>
-          <div class="telemetry-grid">
-            <div class="tele-cell accent-cell">
-              <span class="tele-label">3D SPACE VELOCITY</span>
-              <span id="det-vel-kms" class="tele-val">—</span>
-              <span id="det-vel-kmh" class="tele-sub">—</span>
-            </div>
-            <div class="tele-cell accent-cell">
-              <span class="tele-label">ANNUAL 3D TRAJECTORY</span>
-              <span id="det-traj-yr" class="tele-val">—</span>
-              <span id="det-traj-epoch" class="tele-sub">—</span>
-            </div>
-            <div class="tele-cell full-span live-cell">
-              <span class="tele-label">REAL-TIME DISTANCE TRAVELED (SINCE LOCK)</span>
-              <span id="det-live-km" class="tele-val live-val">0.0 km</span>
-            </div>
-            <div class="tele-cell">
-              <span class="tele-label">VELOCITY COMPONENTS</span>
-              <span id="det-vel-comp" class="tele-val">—</span>
-            </div>
-            <div class="tele-cell">
-              <span class="tele-label">PROPER MOTION (μ)</span>
-              <span id="det-pm" class="tele-val">—</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Section 4: Discovery & Survey Metadata -->
-        <section class="detail-section">
-          <h3 class="section-heading">DISCOVERY &amp; SURVEY METADATA</h3>
-          <dl class="detail-dl">
-            <div class="dl-row">
-              <dt>Discovery</dt>
-              <dd id="det-discovery">—</dd>
-            </div>
-            <div class="dl-row">
-              <dt>Pipeline Quality</dt>
-              <dd id="det-flag">—</dd>
-            </div>
-            <div class="dl-row">
-              <dt>Active Band / FOV</dt>
-              <dd id="det-band-fov">—</dd>
-            </div>
-          </dl>
-        </section>
-
-        <!-- Section 5: F2 Processed Cutout Viewer (.webp / .png) & 102-Channel Spectrum -->
-        <section class="detail-section">
-          <h3 class="section-heading">F2 SKY CUTOUT (.webp / .png) &amp; 102-CH SPECTRUM</h3>
-          <p id="insp-desc" class="insp-desc"></p>
 
           <!-- Backend WCS-Aligned Sky Cutout Viewer -->
           <div id="cutout-viewer-box" class="cutout-box">
             <div class="cutout-header">
-              <span>WCS SKY CUTOUT (.mp4)</span>
+              <span class="cutout-title">
+                <span class="ct-dot" aria-hidden="true"></span>
+                <span class="ct-text">
+                  <span class="ct-main">Vidéo SPHEREx</span>
+                  <span class="ct-sub">Réelle · MP4</span>
+                </span>
+              </span>
               <div class="cutout-btn-group">
-                <button id="diff-mode-btn" type="button" class="diff-toggle" title="Subtract Epoch 1 to reveal motion dipole">
-                  Diff: OFF
-                </button>
                 <button id="marker-toggle-btn" type="button" class="diff-toggle active" title="Afficher / masquer le repère de la cible">
                   ◎ Cible: ON
                 </button>
-                <button id="cutout-fullscreen-btn" type="button" class="diff-toggle" title="Toggle Full-Screen Cutout View">
+                <button id="cutout-fullscreen-btn" type="button" class="diff-toggle" title="Ouvrir la grande fenêtre vidéo SPHEREx">
                   ⛶ Full
                 </button>
               </div>
@@ -376,6 +262,40 @@
             <div class="cutout-subbar">
               <span id="cutout-epoch-label" class="cutout-epoch">Epoch 1 / 4</span>
               <span id="cutout-fov-label" class="cutout-fov">FOV 10 arcmin • WCS-ICRS</span>
+            </div>
+            <!-- Fraîcheur des données : SPHEREx publie de nouvelles images chaque semaine -->
+            <div id="data-freshness" class="data-freshness is-hidden" role="status" aria-live="polite">
+              <span class="df-icon" aria-hidden="true">🛰</span>
+              <span class="df-text"></span>
+            </div>
+            <!-- Nouvelles images intégrées pendant que la page est ouverte -->
+            <div id="data-update-toast" class="data-update-toast is-hidden" role="alert">
+              <span class="dut-text"></span>
+              <button id="data-update-show" type="button" class="dut-btn">Afficher</button>
+            </div>
+            <!-- Choix de la vue : tous les groupes (par défaut) ou un seul groupe -->
+            <div id="group-picker" class="group-picker is-hidden">
+              <div class="group-picker-head">
+                <div class="group-picker-title">
+                  <span class="gp-icon" aria-hidden="true">◈</span>
+                  <span>Groupe affiché</span>
+                </div>
+                <div class="gp-nav">
+                  <span id="group-count" class="gp-count">1 / 1</span>
+                  <button id="group-prev" type="button" class="gp-arrow" title="Groupe précédent" aria-label="Groupe précédent">‹</button>
+                  <button id="group-next" type="button" class="gp-arrow" title="Groupe suivant" aria-label="Groupe suivant">›</button>
+                </div>
+              </div>
+              <!-- une carte cliquable par vue : « Tous les groupes » puis chaque groupe, dans une barre qui défile -->
+              <div id="group-cards" class="group-cards" role="listbox" aria-label="Groupe affiché" tabindex="0"></div>
+              <select id="group-select" class="is-hidden" aria-hidden="true" tabindex="-1"></select>
+            </div>
+            <!-- Remarque sur l'image affichée (désaccord, nouveau bloc…) : à droite, en grand -->
+            <div id="epoch-note" class="tl-note" aria-live="polite"></div>
+            <!-- Message court sur l'accord entre groupes (désaccord, image aberrante…) -->
+            <div id="group-alert" class="group-alert is-hidden" role="status">
+              <div class="ga-title"></div>
+              <div class="ga-msg"></div>
             </div>
             <div class="cutout-media-stage">
               <img id="cutout-img" class="cutout-img-layer" alt="Backend WCS-aligned SPHEREx sky cutout" />
@@ -385,20 +305,8 @@
               <canvas id="cutout-marker-canvas" aria-hidden="true"></canvas>
               <canvas id="cutout-canvas" width="290" height="150"></canvas>
             </div>
-            <div class="cutout-legend">
-              <span><i class="legend-dot ref"></i> Fixed Gaia Stars</span>
-              <span><i class="legend-dot target"></i> Target PSF</span>
-            </div>
           </div>
 
-          <!-- 102-Channel SPHEREx Infrared Spectrum Plot (0.75 – 5.0 µm) -->
-          <div class="spectrum-box">
-            <div class="cutout-header">
-              <span>SPHEREx 102-CHANNEL SPECTRUM</span>
-              <span class="cutout-fov">0.75 – 5.0 µm</span>
-            </div>
-            <canvas id="spectrum-canvas" width="290" height="72"></canvas>
-          </div>
         </section>
       </aside>
 
@@ -407,7 +315,7 @@
            ========================================================= -->
       <section id="timeline-dock" class="timeline-dock" data-owner="F3" aria-label="Observation timeline controls">
         <div id="timeline-status" class="timeline-status" role="status" aria-live="polite">
-          Drag to rotate the 3D universe, pick a SPHEREx galaxy or preset on the left, or click any dwarf to fly in 3D and inspect its trajectory.
+          Drag to rotate the 3D universe, pick an object on the left, or click any object to fly in 3D and inspect its trajectory.
         </div>
 
         <div id="timeline-controls-body" class="tl-hidden">
@@ -417,9 +325,34 @@
               <span id="epoch-date" class="tl-date">—</span>
               <span id="epoch-band" class="tl-band"></span>
             </div>
-            <button id="blink-speed-btn" type="button" class="tl-speed" title="Toggle rapid blink speed">
-              ⏱ Speed: 1x
-            </button>
+            <!-- Vitesse de lecture : un bouton par vitesse (molette = vitesse suivante / précédente) -->
+            <div id="speed-control" class="speed-control" role="group" aria-label="Vitesse de lecture"
+                 title="Vitesse de lecture de la vidéo (molette ou touches - / + pour changer)">
+              <span class="sc-label"><span class="sc-icon" aria-hidden="true">⏱</span> Vitesse</span>
+              <div class="sc-track">
+                <button type="button" class="sc-btn" data-rate="0.25" aria-pressed="false">×0.25</button>
+                <button type="button" class="sc-btn" data-rate="0.5" aria-pressed="false">×0.5</button>
+                <button type="button" class="sc-btn active" data-rate="1" aria-pressed="true">×1</button>
+                <button type="button" class="sc-btn" data-rate="2" aria-pressed="false">×2</button>
+                <button type="button" class="sc-btn" data-rate="4" aria-pressed="false">×4</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date, détecteur et longueur d'onde de l'image affichée : bien visibles -->
+          <div id="epoch-readout" class="epoch-readout" aria-live="polite">
+            <div class="ro-item ro-date-item">
+              <span class="ro-lbl">📅 Date (UTC)</span>
+              <span id="ro-date" class="ro-val">—</span>
+            </div>
+            <div class="ro-item">
+              <span class="ro-lbl">🔭 Détecteur</span>
+              <span id="ro-det" class="ro-val">—</span>
+            </div>
+            <div class="ro-item">
+              <span class="ro-lbl">🌈 Longueur d'onde</span>
+              <span id="ro-wl" class="ro-val">—</span>
+            </div>
           </div>
 
           <div class="tl-row">
@@ -443,6 +376,26 @@
   <!-- =========================================================
        POP-UP 1: 3D Dwarf Trajectory & Auto-Follow Zoom Modal
        ========================================================= -->
+  <!-- =========================================================
+       Vidéo SPHEREx de l'objet (clic sur l'objet) : vidéo + frise + choix du groupe + message
+       Les éléments du panneau de droite y sont DÉPLACÉS pendant l'ouverture (même état).
+       ========================================================= -->
+  <div id="video-modal-backdrop" class="modal-backdrop is-closed" role="dialog" aria-modal="true" aria-labelledby="video-modal-title">
+    <div class="video-modal-card">
+      <div class="modal-header">
+        <div>
+          <div class="modal-eyebrow">SPHEREX • IMAGES RÉELLES ALIGNÉES SUR LE CIEL</div>
+          <h2 id="video-modal-title" class="modal-title">Vidéo SPHEREx</h2>
+        </div>
+        <button id="close-video-modal" type="button" class="close-btn" title="Fermer (Échap)">✕</button>
+      </div>
+      <div class="video-modal-body">
+        <div id="video-modal-main" class="video-modal-main"></div>
+        <aside id="video-modal-side" class="video-modal-side"></aside>
+      </div>
+    </div>
+  </div>
+
   <div id="anim-modal-backdrop" class="modal-backdrop is-closed" role="dialog" aria-modal="true" aria-labelledby="modal-dwarf-title">
     <div class="anim-modal-card">
       <div class="modal-header">
@@ -596,6 +549,7 @@
           </div>
           <div class="compare-img-box">
             <img id="compare-img-a" class="compare-img" alt="Before observation date cutout" />
+            <canvas id="compare-marker-a" class="compare-marker" aria-hidden="true"></canvas>
           </div>
           <div class="compare-pane-meta">
             <span id="compare-meta-date-a">Date: 2025-05-12</span>
@@ -619,6 +573,7 @@
           </div>
           <div class="compare-img-box">
             <img id="compare-img-b" class="compare-img" alt="After observation date cutout" />
+            <canvas id="compare-marker-b" class="compare-marker" aria-hidden="true"></canvas>
           </div>
           <div class="compare-pane-meta">
             <span id="compare-meta-date-b">Date: 2026-11-14</span>
@@ -626,6 +581,13 @@
             <span id="compare-meta-fov-b">FOV: 10 arcmin</span>
           </div>
         </article>
+      </div>
+      <!-- Légende du repère de la cible dans les deux images -->
+      <div class="compare-legend">
+        <span><i class="cl-solid"></i> la cible à cette date</span>
+        <span><i class="cl-ghost"></i> sa position à l'autre date</span>
+        <span><i class="cl-arrow">→</i> son déplacement entre les deux dates</span>
+        <label class="cl-toggle"><input id="compare-marker-toggle" type="checkbox" checked /> Afficher la cible</label>
       </div>
     </div>
   </div>

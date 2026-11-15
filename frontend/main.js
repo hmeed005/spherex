@@ -312,198 +312,13 @@ document.addEventListener("DOMContentLoaded", () => {
       motionPerEpoch: { dx: 10, dy: 7, pulse: 0.1 },
       spectrumProfile: [0.15, 0.19, 0.24, 0.29, 0.22, 0.34, 0.45, 0.58, 0.74, 0.88, 0.95, 0.91],
     },
-    {
-      id: "m31-rv-dwarf",
-      galaxyId: "andromeda",
-      name: "M31-RV Red Nova / Halo Dwarf",
-      shortName: "M31-RV Nova",
-      type: "Andromeda Luminous Red Transient",
-      spectral: "M0Ie–M6Ie",
-      temp: "2,900 K",
-      distanceLy: "2.54 Mly",
-      distanceKm: "2.40 × 10¹⁹ km",
-      velocityKms: "301.0 km/s",
-      velocityNum: 301.0,
-      velocityKmh: "1,083,600 km/h",
-      velComponents: "V_sys −300 | Vt 18 km/s",
-      properMotion: "0.04 mas/yr",
-      properMotionNum: 420,
-      trajPerYearKm: "9.49 × 10⁹ km/yr",
-      trajPerYearBillions: 9.49,
-      trajPerEpochKm: "+4.75B km / 6-mo",
-      mass: "~1.5 M_☉",
-      radiusKm: "~4.2 × 10⁸ km",
-      constellation: "ANDROMEDA",
-      discovery: "1988 / SPHEREx IR",
-      age: "~7 Gyr (Bulge)",
-      flag: "FLAGS: 0x00 NOMINAL",
-      ra: "10.6847",
-      dec: "41.2687",
-      local3D: { x: -45, y: 28, z: 18 },
-      velVec3D: { x: -0.72, y: 0.62, z: 0.31 },
-      trajSpan3D: 54,
-      simMode: "dust-pulsation",
-      summary:
-        "M31-RV is an infrared-luminous stellar merger remnant embedded in the inner bulge of the Andromeda Galaxy (M31) at 2.54 million light-years. Tracked by SPHEREx for circumstellar water-ice and silicate dust condensation.",
-      desc: "Luminous red nova remnant in Andromeda's bulge, forming dense molecular and icy dust shells observable across SPHEREx Bands 1–6.",
-      motionPerEpoch: { dx: 4, dy: -3, pulse: 0.6 },
-      spectrumProfile: [0.22, 0.34, 0.48, 0.62, 0.54, 0.78, 0.85, 0.91, 0.96, 0.89, 0.82, 0.75],
-    },
-    {
-      id: "lmc-r136-core",
-      galaxyId: "lmc",
-      name: "LMC Tarantula / R136 IR Core",
-      shortName: "LMC R136 Core",
-      type: "Magellanic Starburst Cluster",
-      spectral: "O2If* + YSO",
-      temp: "46,000 K / 320 K",
-      distanceLy: "163,000 ly",
-      distanceKm: "1.54 × 10¹⁸ km",
-      velocityKms: "262.2 km/s",
-      velocityNum: 262.2,
-      velocityKmh: "943,920 km/h",
-      velComponents: "Vr +262 | Vt 44 km/s",
-      properMotion: "1.91 mas/yr",
-      properMotionNum: 1910,
-      trajPerYearKm: "8.27 × 10⁹ km/yr",
-      trajPerYearBillions: 8.27,
-      trajPerEpochKm: "+4.13B km / 6-mo",
-      mass: "~450,000 M_☉",
-      radiusKm: "~3.1 × 10¹³ km",
-      constellation: "DORADO",
-      discovery: "SPHEREx Deep Field South",
-      age: "~1.5 Myr (Starburst)",
-      flag: "FLAGS: 0x02 BLENDED_PSF",
-      ra: "84.6762",
-      dec: "-69.1009",
-      local3D: { x: 24, y: -18, z: -12 },
-      velVec3D: { x: 0.65, y: -0.54, z: -0.53 },
-      trajSpan3D: 48,
-      simMode: "binary-orbit",
-      summary:
-        "Located in the Large Magellanic Cloud at 163,000 light-years, R136 lies inside SPHEREx's South Ecliptic Pole Deep Field, receiving hundreds of repeated spectroscopic visits to map biogenic ices in low-metallicity star-forming clouds.",
-      desc: "Extreme starburst nursery in the LMC within the SPHEREx South Ecliptic Pole continuous viewing zone.",
-      motionPerEpoch: { dx: 7, dy: 5, pulse: 0.35 },
-      spectrumProfile: [0.92, 0.85, 0.74, 0.68, 0.59, 0.72, 0.81, 0.76, 0.88, 0.94, 0.91, 0.86],
-    },
-    {
-      id: "m104-ucd1",
-      galaxyId: "sombrero",
-      name: "M104-UCD1 Ultracompact Dwarf",
-      shortName: "M104-UCD1",
-      type: "Ultracompact Dwarf Galaxy",
-      spectral: "K2III Integrated",
-      temp: "4,350 K",
-      distanceLy: "29.3 Mly",
-      distanceKm: "2.77 × 10²⁰ km",
-      velocityKms: "1,024 km/s",
-      velocityNum: 1024,
-      velocityKmh: "3,686,400 km/h",
-      velComponents: "Vr +1024 | V_orb 215 km/s",
-      properMotion: "0.015 mas/yr",
-      properMotionNum: 3100,
-      trajPerYearKm: "3.23 × 10¹⁰ km/yr",
-      trajPerYearBillions: 32.3,
-      trajPerEpochKm: "+16.1B km / 6-mo",
-      mass: "~2.0 × 10⁸ M_☉",
-      radiusKm: "~4.7 × 10¹⁴ km",
-      constellation: "VIRGO",
-      discovery: "Hau et al. / SPHEREx",
-      age: "~11 Gyr (Stripped Core)",
-      flag: "FLAGS: 0x00 NOMINAL",
-      ra: "189.9976",
-      dec: "-11.6231",
-      local3D: { x: 42, y: 16, z: 22 },
-      velVec3D: { x: -0.68, y: 0.64, z: 0.35 },
-      trajSpan3D: 56,
-      simMode: "parallax-drift",
-      summary:
-        "M104-UCD1 is a dense ultracompact dwarf orbiting the Sombrero Galaxy (M104) at 29.3 million light-years. Believed to be the tidally stripped nuclear remnant of a dwarf galaxy harboring a supermassive black hole.",
-      desc: "Tidally stripped dwarf galaxy core orbiting M104's massive dust ring at over 1,000 km/s systemic recessional velocity.",
-      motionPerEpoch: { dx: 11, dy: -6, pulse: 0 },
-      spectrumProfile: [0.58, 0.72, 0.84, 0.91, 0.88, 0.82, 0.77, 0.71, 0.66, 0.61, 0.55, 0.49],
-    },
-    {
-      id: "m33-ngc604",
-      galaxyId: "triangulum",
-      name: "M33 NGC 604 Giant H-II",
-      shortName: "M33 NGC 604",
-      type: "Extragalactic H-II Nursery",
-      spectral: "O/WR + Ice",
-      temp: "38,000 K",
-      distanceLy: "2.73 Mly",
-      distanceKm: "2.58 × 10¹⁹ km",
-      velocityKms: "179.0 km/s",
-      velocityNum: 179.0,
-      velocityKmh: "644,400 km/h",
-      velComponents: "Vr −179 | V_rot 92 km/s",
-      properMotion: "0.03 mas/yr",
-      properMotionNum: 980,
-      trajPerYearKm: "5.65 × 10⁹ km/yr",
-      trajPerYearBillions: 5.65,
-      trajPerEpochKm: "+2.82B km / 6-mo",
-      mass: "~1.0 × 10⁵ M_☉",
-      radiusKm: "~7.1 × 10¹⁴ km",
-      constellation: "TRIANGULUM",
-      discovery: "1784 / SPHEREx Survey",
-      age: "~3 Myr",
-      flag: "FLAGS: 0x00 NOMINAL",
-      ra: "23.6462",
-      dec: "30.7850",
-      local3D: { x: -28, y: -24, z: 10 },
-      velVec3D: { x: 0.62, y: -0.71, z: 0.33 },
-      trajSpan3D: 46,
-      simMode: "dust-pulsation",
-      summary:
-        "NGC 604 is one of the largest H-II star-forming regions in the Local Group, situated in the northern spiral arm of the Triangulum Galaxy (M33) at 2.73 million light-years.",
-      desc: "Colossal ionized hydrogen and molecular ice complex in Triangulum's spiral arm.",
-      motionPerEpoch: { dx: 6, dy: -5, pulse: 0.4 },
-      spectrumProfile: [0.85, 0.79, 0.68, 0.62, 0.74, 0.88, 0.82, 0.76, 0.92, 0.89, 0.84, 0.78],
-    },
-    {
-      id: "m51a-transient",
-      galaxyId: "whirlpool",
-      name: "M51a Spiral Arm IR Source",
-      shortName: "M51a IR Source",
-      type: "Interacting Arm Protostar Cluster",
-      spectral: "B0V + PAH",
-      temp: "28,500 K",
-      distanceLy: "23.2 Mly",
-      distanceKm: "2.19 × 10²⁰ km",
-      velocityKms: "463.0 km/s",
-      velocityNum: 463.0,
-      velocityKmh: "1,666,800 km/h",
-      velComponents: "Vr +463 | V_arm 145 km/s",
-      properMotion: "0.02 mas/yr",
-      properMotionNum: 1450,
-      trajPerYearKm: "1.46 × 10¹⁰ km/yr",
-      trajPerYearBillions: 14.6,
-      trajPerEpochKm: "+7.30B km / 6-mo",
-      mass: "~8.5 × 10⁴ M_☉",
-      radiusKm: "~1.9 × 10¹⁴ km",
-      constellation: "CANES VENATICI",
-      discovery: "SPHEREx PAH Map",
-      age: "~4 Myr",
-      flag: "FLAGS: 0x00 NOMINAL",
-      ra: "202.4696",
-      dec: "47.1953",
-      local3D: { x: 32, y: -22, z: 12 },
-      velVec3D: { x: -0.55, y: -0.78, z: 0.29 },
-      trajSpan3D: 48,
-      simMode: "binary-orbit",
-      summary:
-        "Embedded in the tidally triggered grand-design spiral arm of the Whirlpool Galaxy (M51a), this luminous infrared cluster exhibits intense 3.3 µm PAH emission mapped by SPHEREx Band 3.",
-      desc: "Tidal-bridge star cluster in M51a glowing brightly in SPHEREx polycyclic aromatic hydrocarbon (PAH) infrared bands.",
-      motionPerEpoch: { dx: 8, dy: 6, pulse: 0.3 },
-      spectrumProfile: [0.64, 0.58, 0.51, 0.47, 0.66, 0.95, 0.89, 0.72, 0.84, 0.91, 0.86, 0.79],
-    },
   ];
 
   // F1 Verified Target Presets (Target A, Target B, Target C)
   const VERIFIED_TARGET_PRESETS = {
     "target-a": DWARF_TARGETS[0], // WISE 0855
     "target-b": DWARF_TARGETS[1], // Barnard's Star
-    "target-c": DWARF_TARGETS[6], // M31-RV Nova (Andromeda)
+    "target-c": DWARF_TARGETS[2], // Epsilon Indi B
   };
 
   const galaxyMap = new Map(SPHEREX_GALAXIES.map((g) => [g.id, g]));
@@ -526,8 +341,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const mobileDrawerLabel = document.getElementById("mobile-drawer-label");
   const liveUtcClock = document.getElementById("live-utc-clock");
   const presetPills = Array.from(document.querySelectorAll(".preset-pill"));
-  const activeGalaxyDist = document.getElementById("active-galaxy-dist");
-  const galaxySelectorStrip = document.getElementById("galaxy-selector-strip");
   const catalogSectionTitle = document.getElementById("catalog-section-title");
   const dwarfListScroll = document.getElementById("dwarf-list-scroll");
 
@@ -545,7 +358,33 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("coordinate-form");
   const raInput = document.getElementById("ra-input");
   const decInput = document.getElementById("dec-input");
+
+  // RA / Dec toujours écrits avec un point (champ texte : le navigateur ne les affiche plus
+  // à la française « 133,7951 ») ; une virgule tapée par l'utilisateur devient un point.
+  [raInput, decInput, document.getElementById("fov-select")].forEach((inp) => {
+    inp?.addEventListener("input", () => {
+      if (inp.value.includes(",")) {
+        const pos = inp.selectionStart;
+        inp.value = inp.value.replace(/,/g, ".");
+        try { inp.setSelectionRange(pos, pos); } catch (_) {}
+      }
+    });
+  });
   const fovSelect = document.getElementById("fov-select");
+  // FOV : liste de valeurs ; « Autre… » affiche un champ pour taper sa propre valeur (1 à 12')
+  const fovPreset = document.getElementById("fov-preset");
+  const fovUnit = document.querySelector(".fov-unit");
+  fovPreset?.addEventListener("change", () => {
+    const custom = fovPreset.value === "custom";
+    fovSelect.classList.toggle("is-hidden", !custom);
+    fovUnit?.classList.toggle("is-hidden", !custom);
+    if (custom) {
+      fovSelect.focus();
+      fovSelect.select();
+    } else {
+      fovSelect.value = fovPreset.value;
+    }
+  });
   const detectorSelect = document.getElementById("detector-select");
   const formError = document.getElementById("form-error");
 
@@ -576,37 +415,43 @@ document.addEventListener("DOMContentLoaded", () => {
   const inspector = document.getElementById("target-inspector");
   const closeInspectorBtn = document.getElementById("close-inspector");
   const inspBadge = document.getElementById("insp-badge");
-  const inspFlag = document.getElementById("insp-flag");
+  // étiquette « FLAGS » (code inventé) retirée : élément invisible pour le reste du code
+  const inspFlag = document.getElementById("insp-flag") || document.createElement("span");
   const inspTitle = document.getElementById("insp-title");
   const inspDesignation = document.getElementById("insp-designation");
   const inspSummary = document.getElementById("insp-summary");
+  const FAMOUS_STARS = new Set(["wise-0855", "barnards-star", "epsilon-indi-b", "rw-aurigae", "r-draconis"]);
 
-  const detGalaxy = document.getElementById("det-galaxy");
-  const detType = document.getElementById("det-type");
-  const detSpectral = document.getElementById("det-spectral");
-  const detConstellation = document.getElementById("det-constellation");
-  const detCoords = document.getElementById("det-coords");
-  const detXyz3d = document.getElementById("det-xyz-3d");
+  // Sections « 3D Identity & Astrometry », « Physical Properties » et « Discovery & Survey
+  // Metadata » retirées (valeurs de catalogue, pas des données SPHEREx) : leurs champs
+  // pointent vers des éléments invisibles pour que le reste du code continue de marcher.
+  const detOrDummy = (id) => document.getElementById(id) || document.createElement("span");
+  const detGalaxy = detOrDummy("det-galaxy");
+  const detType = detOrDummy("det-type");
+  const detSpectral = detOrDummy("det-spectral");
+  const detConstellation = detOrDummy("det-constellation");
+  const detCoords = detOrDummy("det-coords");
+  const detXyz3d = detOrDummy("det-xyz-3d");
 
-  const detTemp = document.getElementById("det-temp");
-  const detDistKm = document.getElementById("det-dist-km");
-  const detDistLy = document.getElementById("det-dist-ly");
-  const detMass = document.getElementById("det-mass");
-  const detRadius = document.getElementById("det-radius");
-  const detAge = document.getElementById("det-age");
+  const detTemp = detOrDummy("det-temp");
+  const detDistKm = detOrDummy("det-dist-km");
+  const detDistLy = detOrDummy("det-dist-ly");
+  const detMass = detOrDummy("det-mass");
+  const detRadius = detOrDummy("det-radius");
+  const detAge = detOrDummy("det-age");
 
-  const detVelKms = document.getElementById("det-vel-kms");
-  const detVelKmh = document.getElementById("det-vel-kmh");
-  const detTrajYr = document.getElementById("det-traj-yr");
-  const detTrajEpoch = document.getElementById("det-traj-epoch");
-  const detLiveKm = document.getElementById("det-live-km");
-  const detVelComp = document.getElementById("det-vel-comp");
-  const detPm = document.getElementById("det-pm");
+  const detVelKms = detOrDummy("det-vel-kms");
+  const detVelKmh = detOrDummy("det-vel-kmh");
+  const detTrajYr = detOrDummy("det-traj-yr");
+  const detTrajEpoch = detOrDummy("det-traj-epoch");
+  const detLiveKm = detOrDummy("det-live-km");
+  const detVelComp = detOrDummy("det-vel-comp");
+  const detPm = detOrDummy("det-pm");
 
-  const detDiscovery = document.getElementById("det-discovery");
-  const detFlag = document.getElementById("det-flag");
-  const detBandFov = document.getElementById("det-band-fov");
-  const inspDesc = document.getElementById("insp-desc");
+  const detDiscovery = detOrDummy("det-discovery");
+  const detFlag = detOrDummy("det-flag");
+  const detBandFov = detOrDummy("det-band-fov");
+  const inspDesc = detOrDummy("insp-desc");
 
   const cutoutViewerBox = document.getElementById("cutout-viewer-box");
   const diffModeBtn = document.getElementById("diff-mode-btn");
@@ -617,9 +462,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const cutoutVideo = document.getElementById("cutout-video"); // vidéo MP4 du backend
   const markerCanvas = document.getElementById("cutout-marker-canvas"); // repère de la cible
   const markerToggleBtn = document.getElementById("marker-toggle-btn");
+  const groupPicker = document.getElementById("group-picker");      // choix du groupe à regarder
+  const groupSelect = document.getElementById("group-select");
+  const groupInfoEl = document.getElementById("group-info");   // retiré de l'interface
+  const groupCardsEl = document.getElementById("group-cards");
+  const groupAlertEl = document.getElementById("group-alert");
   const cutoutCanvas = document.getElementById("cutout-canvas");
   const cutoutCtx = cutoutCanvas.getContext("2d");
-  const spectrumCanvas = document.getElementById("spectrum-canvas");
+  const spectrumCanvas = document.getElementById("spectrum-canvas") || document.createElement("canvas"); // spectre inventé retiré
   const spectrumCtx = spectrumCanvas.getContext("2d");
 
   // F3 Timeline Elements
@@ -628,7 +478,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const badgeEl = document.getElementById("epoch-badge");
   const dateEl = document.getElementById("epoch-date");
   const bandEl = document.getElementById("epoch-band");
-  const speedBtn = document.getElementById("blink-speed-btn");
+  const epochNoteEl = document.getElementById("epoch-note");
+  const roDateEl = document.getElementById("ro-date");
+  const roDetEl = document.getElementById("ro-det");
+  const roWlEl = document.getElementById("ro-wl");
+
+  // valeur bien visible sous la vidéo ; petit éclair quand elle change
+  function setReadout(el, text) {
+    if (!el) return;
+    const t = text || "—";
+    if (el.textContent !== t) {
+      el.textContent = t;
+      el.classList.remove("changed");
+      void el.offsetWidth;                // relance l'animation
+      el.classList.add("changed");
+    }
+  }
   const prevBtn = document.getElementById("btn-prev");
   const playBtn = document.getElementById("btn-play");
   const pauseBtn = document.getElementById("btn-pause");
@@ -750,7 +615,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================
   // 5. F1 Verified Target Presets, Multi-Galaxy & Dwarf Catalog
   // =========================================================
-  let activeGalaxyId = "milky-way";
+  // une seule vue : l'univers en général (plus de choix ni de noms de galaxies)
+  let activeGalaxyId = "all";
   let selectedTarget = null;
   let hoveredTarget = null;
   let customTrackedTarget = null;
@@ -788,38 +654,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderGalaxySwitcher() {
-    galaxySelectorStrip.innerHTML = "";
-
-    const options = [
-      { id: "all", label: "All Universe (3D)", dist: "Local Volume" },
-      ...SPHEREX_GALAXIES.map((g) => ({
-        id: g.id,
-        label: g.shortName,
-        dist: g.distanceLabel,
-      })),
-    ];
-
-    options.forEach((opt) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = `galaxy-pill${activeGalaxyId === opt.id ? " is-active" : ""}`;
-      btn.setAttribute("role", "tab");
-      btn.setAttribute("aria-selected", String(activeGalaxyId === opt.id));
-      btn.textContent = opt.label;
-
-      btn.addEventListener("click", () => {
-        setActiveGalaxy(opt.id);
-      });
-
-      galaxySelectorStrip.appendChild(btn);
-    });
-
-    const activeOpt = options.find((o) => o.id === activeGalaxyId) || options[0];
-    activeGalaxyDist.textContent = activeOpt.dist;
-    catalogSectionTitle.textContent =
-      activeGalaxyId === "all"
-        ? "ALL 3D DWARFS & SOURCES"
-        : `${activeOpt.label.toUpperCase()} TARGETS`;
+    // plus de sélecteur de galaxies : l'univers est montré en entier, sans noms
+    activeGalaxyId = "all";
+    if (catalogSectionTitle) catalogSectionTitle.textContent = "OBJETS À SUIVRE";
   }
 
   function setActiveGalaxy(galId) {
@@ -869,7 +706,6 @@ document.addEventListener("DOMContentLoaded", () => {
     list.forEach((target) => {
       const enc = getEncodingForTarget(target);
       const isSelected = selectedTarget?.id === target.id;
-      const g = galaxyMap.get(target.galaxyId);
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = `dwarf-row${isSelected ? " is-selected" : ""}`;
@@ -888,7 +724,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div class="dwarf-row-meta">
           <span>${target.spectral} • ${target.distanceLy}</span>
-          ${activeGalaxyId === "all" && g ? `<span class="dwarf-row-galaxy-badge">${g.shortName}</span>` : `<span>${target.constellation}</span>`}
+          <span>${target.constellation}</span>
         </div>
       `;
 
@@ -964,8 +800,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return sum;
   }
 
-  function createGalaxyTexture(styleKey) {
-    const size = 900;
+  // teintes des galaxies de décor (multiplient les couleurs d'une spirale)
+  const GALAXY_PALETTES = {
+    "spiral-violet": [0.92, 0.7, 1.25],
+    "spiral-rose": [1.15, 0.78, 0.9],
+    "spiral-ice": [0.78, 0.95, 1.2],
+  };
+
+  function createGalaxyTexture(styleKey, size = 900) {
     const canvas = document.createElement("canvas");
     canvas.width = size;
     canvas.height = size;
@@ -986,7 +828,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let red = 0, green = 0, blue = 0, alpha = 0;
 
-        if (styleKey === "sombrero-dust-ring") {
+        if (styleKey === "elliptical-warm" || styleKey === "elliptical-ice") {
+          // galaxie elliptique : grand halo lisse, très lumineux au centre
+          const ex = dx, ey = dy * 1.35;
+          const re = Math.sqrt(ex * ex + ey * ey);
+          if (re >= 1.0) continue;
+          const lum = (Math.exp(-re * 7.5) * 1.5 + Math.exp(-re * 2.6) * 0.42) * (1 - Math.pow(re, 3));
+          if (lum < 0.004) continue;
+          const ice = styleKey === "elliptical-ice";
+          red = 255 * (1 - Math.exp(-(lum * (ice ? 200 : 255)) / 140));
+          green = 255 * (1 - Math.exp(-(lum * (ice ? 220 : 205)) / 145));
+          blue = 255 * (1 - Math.exp(-(lum * (ice ? 255 : 150)) / 150));
+          alpha = Math.min(255, 255 * (1 - Math.exp(-lum * 2.6)));
+        } else if (styleKey === "sombrero-dust-ring") {
           const bulge = Math.exp(-r * 6.5) * 1.45 + Math.exp(-r * 2.8) * 0.45;
           const ringBand = Math.exp(-Math.pow((r - 0.66) / 0.14, 2));
           const dustTurb = fbm5(dx * 14.0 + 3.2, dy * 14.0 + 5.1);
@@ -1053,9 +907,10 @@ document.addEventListener("DOMContentLoaded", () => {
           const gRaw = totalLum * (210 * warmFactor + 204 * blueFactor) + hiiKnot * 44;
           const bRaw = totalLum * (152 * warmFactor + 250 * blueFactor) + hiiKnot * 82;
 
-          red = 255 * (1 - Math.exp(-rRaw / 150));
-          green = 255 * (1 - Math.exp(-gRaw / 155));
-          blue = 255 * (1 - Math.exp(-bRaw / 160));
+          const tint = GALAXY_PALETTES[styleKey] || [1, 1, 1];
+          red = 255 * (1 - Math.exp(-(rRaw * tint[0]) / 150));
+          green = 255 * (1 - Math.exp(-(gRaw * tint[1]) / 155));
+          blue = 255 * (1 - Math.exp(-(bRaw * tint[2]) / 160));
           alpha = Math.min(255, 255 * (1 - Math.exp(-totalLum * 2.75)));
         }
 
@@ -1071,7 +926,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
-    for (let s = 0; s < 3400; s++) {
+    const isElliptical = styleKey.startsWith("elliptical");
+    const nSprinkle = Math.round((isElliptical ? 900 : 3400) * (size / 900) ** 2);
+    for (let s = 0; s < nSprinkle; s++) {
+      if (isElliptical) break;                    // une elliptique n'a pas de bras d'étoiles
       const armIdx = s % 2;
       const rNorm = Math.pow(seededRand(s + 40000), 0.85);
       const r = (0.03 + rNorm * 0.9) * half;
@@ -1099,6 +957,87 @@ document.addEventListener("DOMContentLoaded", () => {
       galaxyTextures[key] = createGalaxyTexture(key);
     }
   );
+  // textures plus légères pour les galaxies de décor
+  ["spiral-violet", "spiral-rose", "spiral-ice", "elliptical-warm", "elliptical-ice"].forEach((key) => {
+    galaxyTextures[key] = createGalaxyTexture(key, 440);
+  });
+
+  // =========================================================
+  // 6b. Galaxies de décor (sans nom) : l'univers paraît plein
+  // =========================================================
+  const SCENERY_STYLES = [
+    "spiral-violet", "elliptical-warm", "spiral-rose", "spiral-blue-hii", "spiral-ice",
+    "elliptical-ice", "spiral-gold-blue", "magellanic-irregular", "sombrero-dust-ring",
+  ];
+
+  const SCENERY_GALAXIES = (() => {
+    const out = [];
+    const taken = SPHEREX_GALAXIES.map((g) => ({ ...g.pos3D, r: g.radius3D }));
+    for (let i = 0, tries = 0; out.length < 16 && tries < 600; tries++) {
+      const a = seededRand(tries * 7 + 501) * Math.PI * 2;
+      const d = 560 + seededRand(tries * 7 + 502) * 560;
+      const pos = {
+        x: Math.cos(a) * d,
+        y: Math.sin(a) * d * 0.85,
+        z: (seededRand(tries * 7 + 503) - 0.5) * 520,
+      };
+      const radius = 48 + seededRand(tries * 7 + 504) * 82;
+      // pas de chevauchement avec les autres galaxies
+      const clash = taken.some((t) => Math.hypot(t.x - pos.x, t.y - pos.y, t.z - pos.z) < (t.r + radius) * 0.95);
+      if (clash) continue;
+      taken.push({ ...pos, r: radius });
+      const edgeOn = seededRand(tries * 7 + 505) < 0.22;   // quelques-unes vues par la tranche
+      out.push({
+        id: `decor-${i}`,
+        decor: true,
+        style: SCENERY_STYLES[i % SCENERY_STYLES.length],
+        pos3D: pos,
+        radius3D: radius,
+        tiltX: edgeOn ? 1.38 + seededRand(tries * 7 + 506) * 0.12 : (seededRand(tries * 7 + 506) - 0.5) * 1.8,
+        tiltY: (seededRand(tries * 7 + 507) - 0.5) * 1.6,
+        spinSpeed: (seededRand(tries * 7 + 508) < 0.5 ? -1 : 1) * (0.025 + seededRand(tries * 7 + 509) * 0.04),
+      });
+      i++;
+    }
+    return out;
+  })();
+
+  // champ profond : petites galaxies très lointaines (taches floues de couleurs variées)
+  function makeSmudge(rgb, flat) {
+    const c = document.createElement("canvas");
+    c.width = c.height = 64;
+    const x = c.getContext("2d");
+    x.translate(32, 32);
+    x.scale(1, flat);
+    const g = x.createRadialGradient(0, 0, 0, 0, 0, 30);
+    g.addColorStop(0, `rgba(${rgb}, 1)`);
+    g.addColorStop(0.18, `rgba(${rgb}, 0.65)`);
+    g.addColorStop(0.55, `rgba(${rgb}, 0.16)`);
+    g.addColorStop(1, `rgba(${rgb}, 0)`);
+    x.fillStyle = g;
+    x.beginPath();
+    x.arc(0, 0, 30, 0, Math.PI * 2);
+    x.fill();
+    return c;
+  }
+  const SMUDGES = [
+    makeSmudge("255, 222, 170", 1), makeSmudge("255, 222, 170", 0.55), makeSmudge("190, 210, 255", 0.4),
+    makeSmudge("220, 180, 255", 0.6), makeSmudge("255, 190, 205", 0.75), makeSmudge("200, 235, 255", 0.3),
+  ];
+  const deepGalaxies3D = Array.from({ length: 140 }, (_, i) => {
+    const u = seededRand(i + 7100), v = seededRand(i + 7200);
+    const theta = u * 2 * Math.PI, phi = Math.acos(2 * v - 1);
+    const r = 900 + seededRand(i + 7300) * 700;
+    return {
+      x: r * Math.sin(phi) * Math.cos(theta),
+      y: r * Math.sin(phi) * Math.sin(theta),
+      z: r * Math.cos(phi),
+      size: 3 + seededRand(i + 7400) ** 2 * 11,
+      rot: seededRand(i + 7500) * Math.PI,
+      alpha: 0.25 + seededRand(i + 7600) * 0.55,
+      sprite: SMUDGES[i % SMUDGES.length],
+    };
+  });
 
   // =========================================================
   // 7. True 3D Universe Camera, Controls & Perspective Engine
@@ -1131,7 +1070,7 @@ document.addEventListener("DOMContentLoaded", () => {
     to: { ...cam3D },
   };
 
-  function flyCamera3D(goal) {
+  function flyCamera3D(goal, opts = {}) {
     const targetState = {
       focusX: goal.focusX ?? cam3D.focusX,
       focusY: goal.focusY ?? cam3D.focusY,
@@ -1151,13 +1090,119 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    if (camFlight.intro && !opts.intro) endIntro(false);   // l'utilisateur a pris la main
     camFlight = {
       active: true,
       startTime: performance.now(),
-      duration: ZOOM_DURATION_MS,
+      duration: opts.duration || ZOOM_DURATION_MS,
+      ease: opts.ease || null,
+      logZoom: !!opts.logZoom,
+      intro: !!opts.intro,
       from: { ...cam3D },
       to: targetState,
     };
+  }
+
+  // =========================================================
+  // 7b. Animation d'ouverture : on arrive de très loin dans l'espace
+  // =========================================================
+  const INTRO_DURATION_MS = 5200;
+  const introOverlay = document.getElementById("intro-overlay");
+  const introSkipBtn = document.getElementById("intro-skip");
+  let introRunning = false;
+
+  // lent au départ, rapide au milieu, freinage doux à l'arrivée
+  const easeInOutQuint = (t) => (t < 0.5 ? 16 * t ** 5 : 1 - (-2 * t + 2) ** 5 / 2);
+
+  function introProgress(now) {
+    if (!introRunning || !camFlight.intro) return 1;
+    return Math.min(1, Math.max(0, (now - camFlight.startTime) / camFlight.duration));
+  }
+
+  function startIntro() {
+    const home = { ...cam3D };
+    if (prefersReducedMotion) return;
+    introRunning = true;
+    document.body.classList.add("intro-running");
+    introOverlay?.classList.remove("is-hidden");
+    // point de départ : très très loin, vu presque par la tranche, tourné
+    Object.assign(cam3D, { zoom: 0.018, yaw: home.yaw - 2.6, pitch: 0.32, panX: 0, panY: 0, dim: 0 });
+    flyCamera3D(home, { duration: INTRO_DURATION_MS, ease: easeInOutQuint, logZoom: true, intro: true });
+  }
+
+  function endIntro(jumpToEnd) {
+    if (!introRunning) return;
+    introRunning = false;
+    if (jumpToEnd && camFlight.intro) {
+      Object.assign(cam3D, camFlight.to);
+      camFlight.active = false;
+    }
+    camFlight.intro = false;
+    document.body.classList.remove("intro-running");
+    document.body.classList.add("intro-reveal");          // les panneaux apparaissent un à un
+    setTimeout(() => document.body.classList.remove("intro-reveal"), 2200);
+    introOverlay?.classList.add("is-fading");
+    setTimeout(() => {
+      introOverlay?.classList.add("is-hidden");
+      introOverlay?.classList.remove("is-fading");
+    }, 900);
+    syncCamControlsUI();
+  }
+
+  // toucher la vue pendant l'approche = passer l'introduction
+  ["mousedown", "wheel", "touchstart"].forEach((ev) =>
+    skyCanvas?.addEventListener(ev, () => { if (introRunning) endIntro(true); }, { passive: true }));
+
+  introSkipBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    endIntro(true);
+  });
+  window.addEventListener("keydown", (e) => {
+    if (introRunning && (e.key === "Escape" || e.key === " " || e.key === "Enter")) endIntro(true);
+  });
+
+  // traînées d'étoiles « vitesse lumière » pendant l'approche
+  const WARP_STREAKS = Array.from({ length: 220 }, (_, i) => ({
+    a: seededRand(i + 9100) * Math.PI * 2,
+    phase: seededRand(i + 9200),
+    speed: 0.6 + seededRand(i + 9300) * 0.9,
+    width: 0.6 + seededRand(i + 9400) * 1.4,
+    tint: i % 5 === 0 ? "170, 220, 255" : i % 7 === 0 ? "255, 214, 170" : "237, 240, 247",
+  }));
+
+  function drawWarp(now, t) {
+    // intensité : monte vite, culmine au milieu du voyage, s'éteint avant l'arrivée
+    const k = Math.max(0, Math.sin(Math.PI * Math.min(1, t / 0.82)));
+    if (k < 0.01) return;
+    const cx = stageW * 0.5, cy = stageH * 0.5;
+    const R = Math.hypot(stageW, stageH) * 0.55;
+    const tt = now / 1000;
+    skyCtx.save();
+    skyCtx.globalCompositeOperation = "lighter";
+    skyCtx.lineCap = "round";
+    for (const st of WARP_STREAKS) {
+      const f = (st.phase + tt * st.speed * (0.35 + 1.6 * k)) % 1;
+      const r1 = R * f * f;
+      const len = R * (0.02 + 0.22 * k) * (0.3 + f);
+      const r0 = Math.max(0, r1 - len);
+      const ca = Math.cos(st.a), sa = Math.sin(st.a);
+      const g = skyCtx.createLinearGradient(cx + ca * r0, cy + sa * r0, cx + ca * r1, cy + sa * r1);
+      g.addColorStop(0, `rgba(${st.tint}, 0)`);
+      g.addColorStop(1, `rgba(${st.tint}, ${(0.85 * k * Math.min(1, f * 3)).toFixed(3)})`);
+      skyCtx.strokeStyle = g;
+      skyCtx.lineWidth = st.width * (0.6 + f);
+      skyCtx.beginPath();
+      skyCtx.moveTo(cx + ca * r0, cy + sa * r0);
+      skyCtx.lineTo(cx + ca * r1, cy + sa * r1);
+      skyCtx.stroke();
+    }
+    // lueur au centre : l'univers local qui approche
+    const glow = skyCtx.createRadialGradient(cx, cy, 0, cx, cy, R * 0.35);
+    glow.addColorStop(0, `rgba(120, 200, 255, ${(0.18 * k).toFixed(3)})`);
+    glow.addColorStop(1, "rgba(120, 200, 255, 0)");
+    skyCtx.fillStyle = glow;
+    skyCtx.fillRect(0, 0, stageW, stageH);
+    skyCtx.restore();
   }
 
   function project3D(wx, wy, wz) {
@@ -1339,12 +1384,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const enc = getEncodingForTarget(target);
     const w3d = getTargetWorld3D(target);
-    const v = target.velVec3D || { x: 0.7, y: -0.5, z: 0.4 };
+    // Mouvement MESURÉ par SPHEREx (backend), s'il est connu ; sinon valeurs du catalogue.
+    // Position saisie à la main : pas de flèche tant que rien n'est mesuré (pas de valeur inventée).
+    const meas = target._measured || null;
+    const showArrow = meas ? meas.moving : target.id !== "custom-field";
+    let v = target.velVec3D || { x: 0.7, y: -0.5, z: 0.4 };
+    let span = target.trajSpan3D || 50;
+    if (meas && meas.moving) {
+      const pa = ((meas.pa ?? 0) * Math.PI) / 180;      // 0 = nord, 90 = est
+      v = { x: -Math.sin(pa), y: -Math.cos(pa), z: 0.15 }; // nord en haut, est à gauche
+      span = 25 + 18 * Math.log10(1 + meas.mu);
+    }
     const vLen = Math.hypot(v.x, v.y, v.z) || 1;
     const ux = v.x / vLen;
     const uy = v.y / vLen;
     const uz = v.z / vLen;
-    const span = target.trajSpan3D || 50;
 
     const pts3D = {
       start: { x: w3d.x - ux * span, y: w3d.y - uy * span, z: w3d.z - uz * span },
@@ -1394,7 +1448,7 @@ document.addEventListener("DOMContentLoaded", () => {
     hitPath.classList.add("svg-anim-trigger");
     hitPath.addEventListener("click", (e) => {
       e.stopPropagation();
-      openAnimationModal(target);
+      openVideoModal(target);
     });
     trajCameraGroup.appendChild(hitPath);
 
@@ -1406,7 +1460,7 @@ document.addEventListener("DOMContentLoaded", () => {
     traveler.classList.add("svg-anim-trigger");
     traveler.addEventListener("click", (e) => {
       e.stopPropagation();
-      openAnimationModal(target);
+      openVideoModal(target);
     });
     trajCameraGroup.appendChild(traveler);
 
@@ -1416,7 +1470,7 @@ document.addEventListener("DOMContentLoaded", () => {
         g.classList.add("svg-anim-trigger");
         g.addEventListener("click", (e) => {
           e.stopPropagation();
-          openAnimationModal(target);
+          openVideoModal(target);
         });
       }
 
@@ -1460,11 +1514,31 @@ document.addEventListener("DOMContentLoaded", () => {
       return { g, tick, dot, bg, t1, t2, boxW, boxH };
     };
 
-    const callouts = {
-      start: makeCallout("EPOCH 1 (3D)", "2025-05-12", false),
-      current: makeCallout(`3D • ${target.velocityKms}`, "🎬 Click: Follow-Zoom Pop-up", true),
-      yearProj: makeCallout(`+1-YR: ${target.trajPerYearKm}`, `μ = ${target.properMotion}`, true),
-    };
+    const fmtMu = (x) => (x == null ? "?" : x.toFixed(x < 1 ? 2 : 1));
+    const callouts = meas
+      ? {
+          start: makeCallout("1re image SPHEREx", meas.start || "", false),
+          current: makeCallout(meas.moving ? `SPHEREx • ${fmtMu(meas.mu)}″/an` : "SPHEREx",
+                               "🎬 Clic : vidéo SPHEREx", true),
+          yearProj: makeCallout("Mesuré par SPHEREx",
+                                `μ = ${fmtMu(meas.mu)} ± ${fmtMu(meas.err)}″/an`, true),
+        }
+      : target.id === "custom-field"
+        ? {
+            start: makeCallout("", "", false),
+            current: makeCallout("SPHEREx", "🎬 Clic : vidéo SPHEREx", true),
+            yearProj: makeCallout("", "", true),
+          }
+        : {
+            start: makeCallout("EPOCH 1 (3D)", "2025-05-12", false),
+            current: makeCallout(`3D • ${target.velocityKms}`, "🎬 Click: Follow-Zoom Pop-up", true),
+            yearProj: makeCallout(`+1-YR: ${target.trajPerYearKm}`, `μ = ${target.properMotion}`, true),
+          };
+    if (!showArrow) {
+      // objet immobile ou mouvement non mesuré : pas de flèche ni d'étiquettes de trajectoire
+      [guidePath, activePath, hitPath, traveler, callouts.start.g, callouts.yearProj.g]
+        .forEach((el) => el && (el.style.display = "none"));
+    }
 
     trajAnim = {
       active: !prefersReducedMotion,
@@ -1588,25 +1662,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     skyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    if (activeGalaxyId === "all" || gal.id !== activeGalaxyId) {
-      skyCtx.save();
-      skyCtx.fillStyle = "rgba(0, 0, 1, 0.85)";
-      const label = `${gal.shortName} • ${gal.distanceLabel}`;
-      skyCtx.font = "600 10.5px system-ui";
-      const tw = skyCtx.measureText(label).width + 12;
-      skyCtx.beginPath();
-      skyCtx.roundRect(pCenter.x - tw * 0.5, pCenter.y + 18, tw, 17, 5);
-      skyCtx.fill();
-      skyCtx.strokeStyle = "rgba(56, 178, 172, 0.35)";
-      skyCtx.lineWidth = 0.8;
-      skyCtx.stroke();
-
-      skyCtx.fillStyle = "#8b93a7";
-      skyCtx.textAlign = "center";
-      skyCtx.textBaseline = "middle";
-      skyCtx.fillText(label, pCenter.x, pCenter.y + 27);
-      skyCtx.restore();
-    }
+    // pas de nom de galaxie dans la vue 3D : l'univers en général
   }
 
   function renderFrame(now) {
@@ -1631,14 +1687,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (rawT >= 1) {
         Object.assign(cam3D, camFlight.to);
         camFlight.active = false;
+        if (camFlight.intro) endIntro(false);
       } else {
-        const e = cubicBezierEaseOut(Math.max(0, rawT));
+        const e = (camFlight.ease || cubicBezierEaseOut)(Math.max(0, rawT));
         cam3D.focusX = camFlight.from.focusX + (camFlight.to.focusX - camFlight.from.focusX) * e;
         cam3D.focusY = camFlight.from.focusY + (camFlight.to.focusY - camFlight.from.focusY) * e;
         cam3D.focusZ = camFlight.from.focusZ + (camFlight.to.focusZ - camFlight.from.focusZ) * e;
         cam3D.yaw = camFlight.from.yaw + (camFlight.to.yaw - camFlight.from.yaw) * e;
         cam3D.pitch = camFlight.from.pitch + (camFlight.to.pitch - camFlight.from.pitch) * e;
-        cam3D.zoom = camFlight.from.zoom + (camFlight.to.zoom - camFlight.from.zoom) * e;
+        cam3D.zoom = camFlight.logZoom
+          ? camFlight.from.zoom * Math.pow(camFlight.to.zoom / camFlight.from.zoom, e)   // zoom régulier
+          : camFlight.from.zoom + (camFlight.to.zoom - camFlight.from.zoom) * e;
         cam3D.panX = camFlight.from.panX + (camFlight.to.panX - camFlight.from.panX) * e;
         cam3D.panY = camFlight.from.panY + (camFlight.to.panY - camFlight.from.panY) * e;
         cam3D.dim = camFlight.from.dim + (camFlight.to.dim - camFlight.from.dim) * e;
@@ -1652,6 +1711,13 @@ document.addEventListener("DOMContentLoaded", () => {
       galaxySpinTime += 0.004;
     }
 
+    // la vue a changé de taille (barre de gauche qui se replie / glisse) : canvas ajusté
+    const stageRect = galaxyStage.getBoundingClientRect();
+    if (Math.max(300, Math.round(stageRect.width)) !== stageW ||
+        Math.max(300, Math.round(stageRect.height)) !== stageH) {
+      build3DStarfield();
+    }
+
     skyCtx.fillStyle = "#000001";
     skyCtx.fillRect(0, 0, stageW, stageH);
 
@@ -1663,6 +1729,23 @@ document.addEventListener("DOMContentLoaded", () => {
       skyCtx.arc(p.x, p.y, st.size, 0, Math.PI * 2);
       skyCtx.fill();
     }
+
+    // petites galaxies lointaines (parallaxe comme les étoiles de fond)
+    skyCtx.save();
+    skyCtx.globalCompositeOperation = "lighter";
+    for (const dg of deepGalaxies3D) {
+      const p = project3D(dg.x + cam3D.focusX * 0.25, dg.y + cam3D.focusY * 0.25, dg.z + cam3D.focusZ * 0.25);
+      const sz = dg.size * Math.min(1.6, Math.max(0.5, p.scale * 1.4));
+      if (p.x < -sz || p.x > stageW + sz || p.y < -sz || p.y > stageH + sz) continue;
+      skyCtx.globalAlpha = dg.alpha * (1 - cam3D.dim * 0.4);
+      skyCtx.translate(p.x, p.y);
+      skyCtx.rotate(dg.rot + cam3D.yaw * 0.3);
+      skyCtx.drawImage(dg.sprite, -sz, -sz, sz * 2, sz * 2);
+      skyCtx.setTransform(1, 0, 0, 1, 0, 0);
+      const dpr0 = Math.min(window.devicePixelRatio || 1, 2);
+      skyCtx.setTransform(dpr0, 0, 0, dpr0, 0, 0);
+    }
+    skyCtx.restore();
 
     for (const ds of diffractionStars) {
       const len = ds.spikeLen;
@@ -1693,9 +1776,17 @@ document.addEventListener("DOMContentLoaded", () => {
       skyCtx.fill();
     }
 
+    const introT = introProgress(now);
+    if (introRunning && introT >= 1) endIntro(true);     // filet de sécurité
+    if (introT < 1) {
+      drawWarp(now, introT);
+      // le titre s'efface quand on arrive
+      if (introOverlay) introOverlay.style.setProperty("--intro-t", introT.toFixed(3));
+    }
+
     const galaxiesToDraw =
       activeGalaxyId === "all"
-        ? [...SPHEREX_GALAXIES]
+        ? [...SPHEREX_GALAXIES, ...SCENERY_GALAXIES]
         : SPHEREX_GALAXIES.filter((g) => g.id === activeGalaxyId);
 
     galaxiesToDraw.sort((a, b) => {
@@ -1705,7 +1796,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     for (const gal of galaxiesToDraw) {
-      const alpha = 1 - cam3D.dim * 0.34;
+      const alpha = (gal.decor ? 0.9 : 1) - cam3D.dim * 0.34;
       drawGalaxyDisk3D(gal, galaxySpinTime * gal.spinSpeed, alpha);
     }
 
@@ -1717,6 +1808,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     visibleTargets.sort((a, b) => b.proj.depth - a.proj.depth);
+    // les objets (et leurs étiquettes) n'apparaissent qu'à la fin de l'approche
+    skyCtx.globalAlpha = introT < 1 ? Math.max(0, (introT - 0.72) / 0.28) : 1;
 
     for (const item of visibleTargets) {
       const { target, w3d, proj, planeProj } = item;
@@ -1816,6 +1909,7 @@ document.addEventListener("DOMContentLoaded", () => {
       skyCtx.fillText(labelText, proj.x, pillY + pillH / 2 + 0.5);
     }
 
+    skyCtx.globalAlpha = 1;
     updateTrajectoryOverlay3D(now);
 
     if (isModalOpen && selectedTarget) {
@@ -1857,11 +1951,9 @@ document.addEventListener("DOMContentLoaded", () => {
     hoveredTarget = hit;
 
     if (hit) {
-      const g = galaxyMap.get(hit.galaxyId);
       skyCanvas.style.cursor = "pointer";
       tooltipName.textContent = hit.shortName || hit.name;
       tooltipSpec.textContent = hit.spectral || "IR";
-      tooltipGalaxy.textContent = g ? `Host Galaxy: ${g.name}` : "";
       tooltipType.textContent = hit.type;
       tooltipCoords.textContent = `RA ${hit.ra}° • Dec ${hit.dec}°`;
       tooltipMetrics.textContent = `Dist: ${hit.distanceKm} (${hit.distanceLy})`;
@@ -1895,7 +1987,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const hit = findTargetAt(mx, my);
     if (hit) {
       if (selectedTarget?.id === hit.id) {
-        openAnimationModal(hit);
+        openVideoModal(hit);
       } else {
         selectAndZoomToTarget(hit);
       }
@@ -1940,9 +2032,13 @@ document.addEventListener("DOMContentLoaded", () => {
     inspFlag.textContent = target.flag || "FLAGS: 0x00 NOMINAL";
     inspTitle.textContent = target.shortName || target.name;
     inspDesignation.textContent = target.name;
-    inspSummary.textContent = target.summary || target.desc;
+    // Paragraphe de présentation : seulement pour les étoiles connues (pas pour une position
+    // tapée à la main, ni pour les objets fictifs ou les régions de galaxies)
+    const famous = FAMOUS_STARS.has(target.id);
+    inspSummary.textContent = famous ? target.summary || target.desc || "" : "";
+    inspSummary.classList.toggle("is-hidden", !famous || !inspSummary.textContent);
 
-    detGalaxy.textContent = hostGal ? hostGal.name : "Milky Way";
+    detGalaxy.textContent = "";
     detType.textContent = target.type;
     detSpectral.textContent = target.spectral || "Unknown";
     detConstellation.textContent = target.constellation || "Unknown";
@@ -1971,7 +2067,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cutoutFovLabel.textContent = `FOV ${fovSelect.value} arcmin • WCS-ICRS`;
 
     backToGalaxyBtn.classList.remove("is-hidden");
-    openAnimModalBtn.classList.remove("is-hidden");
+    openAnimModalBtn?.classList.remove("is-hidden");
     inspector.classList.remove("is-closed");
     renderSpectrumPlot(target);
 
@@ -2000,6 +2096,14 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     );
 
+    await loadObservations(target);
+  }
+
+  // Chargement de la vidéo SPHEREx d'une cible (aussi rappelé quand de nouvelles images
+  // SPHEREx ont été intégrées par la mise à jour automatique hebdomadaire)
+  async function loadObservations(target) {
+    const fovArcmin = Number.parseFloat(fovSelect.value) || 10;
+    const bandLabel = detectorSelect.value;
     // Fetch multi-epoch cutouts via F1's single API adapter (observationsApi.js)
     // N° de requête : seule la DERNIÈRE demande peut afficher son résultat
     // (sinon une réponse lente d'une demande précédente remplace la vidéo en cours).
@@ -2018,13 +2122,33 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (requestNo !== observationsRequestNo || selectedTarget?.id !== target.id) return;
+      const m = apiRes?.motion;
+      target._measured = m
+        ? {
+            moving: m.status === "moving" && m.mu_arcsec_yr != null,
+            mu: m.mu_arcsec_yr,
+            err: m.mu_err_arcsec_yr,
+            pa: m.position_angle_deg,
+            start: m.coverage_start,
+          }
+        : null;
+      buildTrajectoryOverlay3D(target);
+
       if (!Array.isArray(apiRes?.frames)) {
         throw new Error("Observation API returned an invalid response (expected a frames array).");
       }
 
       window.dispatchEvent(
         new CustomEvent("spherex:framesLoaded", {
-          detail: { frames: apiRes.frames, video: apiRes.video || null },
+          detail: {
+            frames: apiRes.frames,
+            video: apiRes.video || null,
+            views: apiRes.views || [],
+            alert: apiRes.alert || null,
+            update: apiRes.update || null,
+            resultKey: apiRes.resultKey || null,
+            targetId: target.id,
+          },
         })
       );
     } catch (err) {
@@ -2038,6 +2162,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function returnToGalaxyView(triggerFlight = true) {
+    try {
+      closeVideoModal();
+    } catch (_) {}
     closeAnimationModal();
     closeCompareModal();
     selectedTarget = null;
@@ -2076,12 +2203,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     inspector.classList.add("is-closed");
     backToGalaxyBtn.classList.add("is-hidden");
-    openAnimModalBtn.classList.add("is-hidden");
+    openAnimModalBtn?.classList.add("is-hidden");
 
     bodyEl.classList.add("tl-hidden");
     statusEl.className = "timeline-status";
     statusEl.textContent =
-      "Drag to rotate the 3D universe, pick a SPHEREx galaxy or preset on the left, or click any dwarf to fly in 3D and inspect its trajectory.";
+      "Drag to rotate the 3D universe, pick an object on the left, or click any object to fly in 3D and inspect its trajectory.";
     statusEl.classList.remove("tl-hidden");
   }
 
@@ -2160,7 +2287,7 @@ document.addEventListener("DOMContentLoaded", () => {
     modalSimCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     const hostGal = galaxyMap.get(target.galaxyId);
-    modalGalaxySubtitle.textContent = `${hostGal ? hostGal.name.toUpperCase() : "MILKY WAY"} • 3D TRAJECTORY SIMULATOR`;
+    modalGalaxySubtitle.textContent = "3D TRAJECTORY SIMULATOR";
     modalDwarfTitle.textContent = `${target.shortName || target.name} — 3D Follow-Zoom Kinematics`;
     hudSimVel.textContent = target.velocityKms || "Unknown";
     modalPlayBtn.textContent = "⏸ Pause";
@@ -2176,8 +2303,9 @@ document.addEventListener("DOMContentLoaded", () => {
     animModalBackdrop.classList.add("is-closed");
   }
 
-  openAnimModalBtn.addEventListener("click", () => openAnimationModal(selectedTarget));
-  inspectorAnimTrigger.addEventListener("click", () => openAnimationModal(selectedTarget));
+  // boutons « 3D Trajectory & Speed » retirés de l'interface (simulateur 3D non utilisé)
+  openAnimModalBtn?.addEventListener("click", () => openAnimationModal(selectedTarget));
+  inspectorAnimTrigger?.addEventListener("click", () => openAnimationModal(selectedTarget));
   closeAnimModalBtn.addEventListener("click", closeAnimationModal);
   animModalBackdrop.addEventListener("click", (e) => {
     if (e.target === animModalBackdrop) closeAnimationModal();
@@ -2666,7 +2794,98 @@ document.addEventListener("DOMContentLoaded", () => {
     compareMetaDateB.textContent = `Date: ${fB.date}`;
     compareMetaBandB.textContent = fB.band;
     compareMetaFovB.textContent = `FOV: ${fB.fov || `${fovSelect.value} arcmin`}`;
+    requestAnimationFrame(drawCompareMarkers);
   }
+
+  // --- Repère de la cible dans « Compare 2 Dates » : les images fixes sont exactement les
+  // images de la vidéo, donc les positions (pixels vidéo) s'y appliquent directement.
+  const compareMarkerA = document.getElementById("compare-marker-a");
+  const compareMarkerB = document.getElementById("compare-marker-b");
+  const compareMarkerToggle = document.getElementById("compare-marker-toggle");
+
+  function drawTargetRing(ctx, p, r, measured, solid) {
+    ctx.save();
+    ctx.lineWidth = solid ? 2 : 1.4;
+    ctx.strokeStyle = solid ? (measured ? "#00e5ff" : "rgba(220,220,220,0.95)") : "rgba(255,255,255,0.7)";
+    if (!solid || !measured) ctx.setLineDash([4, 3]);
+    ctx.shadowColor = "rgba(0,0,0,0.9)";
+    ctx.shadowBlur = 4;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.stroke();
+    if (solid) {
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => {
+        ctx.moveTo(p.x + dx * (r + 4), p.y + dy * (r + 4));
+        ctx.lineTo(p.x + dx * (r + 12), p.y + dy * (r + 12));
+      });
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawArrow(ctx, a, b) {
+    const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy);
+    if (L < 6) return;                          // pas de déplacement visible
+    const ux = dx / L, uy = dy / L, h = Math.min(10, L * 0.4);
+    ctx.save();
+    ctx.strokeStyle = "#ffb547";
+    ctx.fillStyle = "#ffb547";
+    ctx.lineWidth = 2;
+    ctx.shadowColor = "rgba(0,0,0,0.9)";
+    ctx.shadowBlur = 4;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x - ux * h, b.y - uy * h);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(b.x, b.y);
+    ctx.lineTo(b.x - ux * h - uy * h * 0.55, b.y - uy * h + ux * h * 0.55);
+    ctx.lineTo(b.x - ux * h + uy * h * 0.55, b.y - uy * h - ux * h * 0.55);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawCompareMarkers() {
+    const fA = frames[Number(compareSelectA?.value) || 0];
+    const fB = frames[Number(compareSelectB?.value) || 0];
+    [[compareMarkerA, compareImgA, fA, fB, false], [compareMarkerB, compareImgB, fB, fA, true]]
+      .forEach(([cv, img, f, other, isB]) => {
+        if (!cv || !img) return;
+        const box = cv.parentElement;
+        const W = box.clientWidth, H = box.clientHeight;
+        const dpr = window.devicePixelRatio || 1;
+        cv.width = Math.round(W * dpr);
+        cv.height = Math.round(H * dpr);
+        const ctx = cv.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+        if (compareMarkerToggle && !compareMarkerToggle.checked) return;
+        const nw = img.naturalWidth, nh = img.naturalHeight;
+        if (!f || !nw || !nh || !img.complete) return;
+        const k = Math.min(W / nw, H / nh);             // object-fit: contain
+        const ox = (W - nw * k) / 2, oy = (H - nh * k) / 2;
+        const P = (q) => ({ x: ox + q.x * k, y: oy + q.y * k });
+        const r = Math.min(34, Math.max(10, 2.5 * (videoInfo?.pxScale || 6) * k));
+        const here = f.markerMeasured || f.markerPredicted;
+        const there = other && other !== f ? other.markerMeasured || other.markerPredicted : null;
+        if (there) drawTargetRing(ctx, P(there), r, true, false);
+        if (here && there) {
+          // la flèche va toujours de la date A vers la date B
+          isB ? drawArrow(ctx, P(there), P(here)) : drawArrow(ctx, P(here), P(there));
+        }
+        if (here) drawTargetRing(ctx, P(here), r, !!f.markerMeasured, true);
+      });
+  }
+
+  compareImgA?.addEventListener("load", drawCompareMarkers);
+  compareImgB?.addEventListener("load", drawCompareMarkers);
+  compareMarkerToggle?.addEventListener("change", drawCompareMarkers);
+  window.addEventListener("resize", () => {
+    if (!compareModalBackdrop?.classList.contains("is-closed")) drawCompareMarkers();
+  });
 
   function closeCompareModal() {
     compareModalBackdrop.classList.add("is-closed");
@@ -2681,16 +2900,9 @@ document.addEventListener("DOMContentLoaded", () => {
   compareSelectA?.addEventListener("change", renderCompareFrames);
   compareSelectB?.addEventListener("change", renderCompareFrames);
 
-  // Full-Screen Cutout Toggle (F2)
-  cutoutFullscreenBtn?.addEventListener("click", async () => {
-    if (!cutoutViewerBox) return;
-    try {
-      if (!document.fullscreenElement) {
-        await cutoutViewerBox.requestFullscreen();
-      } else {
-        await document.exitFullscreen();
-      }
-    } catch (_) {}
+  // « Full » : ouvre la grande fenêtre vidéo SPHEREx (la même qu'au clic sur l'objet)
+  cutoutFullscreenBtn?.addEventListener("click", () => {
+    openVideoModal(selectedTarget);
   });
 
   // =========================================================
@@ -2827,7 +3039,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  diffModeBtn.addEventListener("click", () => {
+  // bouton « Diff » retiré de l'interface
+  diffModeBtn?.addEventListener("click", () => {
     diffSubtractionMode = !diffSubtractionMode;
     diffModeBtn.textContent = diffSubtractionMode ? "Diff: ON" : "Diff: OFF";
     diffModeBtn.classList.toggle("active", diffSubtractionMode);
@@ -2842,6 +3055,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function clearInputErrors() {
     raInput.closest(".field-group").classList.remove("input-error");
     decInput.closest(".field-group").classList.remove("input-error");
+    fovSelect.closest(".field-group")?.classList.remove("input-error");
     formError.textContent = "";
     formError.classList.remove("visible");
   }
@@ -2857,8 +3071,8 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     clearInputErrors();
 
-    const rawRa = raInput.value.trim();
-    const rawDec = decInput.value.trim();
+    const rawRa = raInput.value.trim().replace(/,/g, ".");
+    const rawDec = decInput.value.trim().replace(/,/g, ".").replace("−", "-");
     const raNum = Number(rawRa);
     const decNum = Number(rawDec);
 
@@ -2870,6 +3084,14 @@ document.addEventListener("DOMContentLoaded", () => {
       showInputError(decInput, "Declination (Dec) must be between −90° and +90°.");
       return;
     }
+    // FOV libre : toute valeur entre 1' et 12' (limite du serveur : au-delà, les images
+    // à télécharger deviennent trop lourdes)
+    const fovNum = Number(fovSelect.value.trim().replace(/,/g, "."));
+    if (!Number.isFinite(fovNum) || fovNum < 1 || fovNum > 12) {
+      showInputError(fovSelect, "Le champ de vue (FOV) doit être entre 1 et 12 minutes d'arc.");
+      return;
+    }
+    fovSelect.value = String(fovNum);
 
     const matched = getAllTargets().find(
       (t) =>
@@ -2936,15 +3158,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let frames = [];
   let currentIndex = 0;
   let timerId = null;
-  let fastBlink = false;
 
   // --- Mode vidéo : le backend renvoie UNE vidéo MP4 + la frise (une entrée par image).
   // La vidéo est la source de vérité : la case de détails suit la vidéo, et changer
   // la date (points, curseur, Prev/Next) déplace la vidéo à cette date.
   let videoMode = false;
   let syncingFromVideo = false;
-  const VIDEO_SPEEDS = [1, 2, 4, 0.5, 0.25];
-  let videoSpeedIdx = 0;
 
   function setPlayButtons(playing) {
     playBtn.classList.toggle("primary", playing);
@@ -3114,6 +3333,16 @@ document.addEventListener("DOMContentLoaded", () => {
       cutoutImg.src = frame.imageUrl;
     }
     bandEl.title = frame.note || "";
+    setReadout(roDateEl, frame.dateUtc ? frame.dateUtc.replace("T", "  ").slice(0, 17) : frame.date);
+    setReadout(roDetEl, frame.detector || "");
+    setReadout(roWlEl, typeof frame.wavelengthUm === "number" ? `${frame.wavelengthUm.toFixed(3)} µm` : "");
+    if (epochNoteEl) {
+      // à droite : en grand pour un désaccord, discret pour les autres remarques
+      const important = /^[⚠ℹ]/.test(frame.note || "");
+      epochNoteEl.textContent = important ? frame.note : "";
+      epochNoteEl.classList.toggle("warn", (frame.note || "").startsWith("⚠"));
+      epochNoteEl.classList.toggle("info", (frame.note || "").startsWith("ℹ"));
+    }
     drawMarkers();
 
     if (selectedTarget) {
@@ -3137,7 +3366,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (timerId || frames.length <= 1) return;
     playBtn.classList.add("primary");
     pauseBtn.classList.remove("primary");
-    timerId = window.setInterval(() => goToEpoch(currentIndex + 1), fastBlink ? 320 : 1200);
+    timerId = window.setInterval(() => goToEpoch(currentIndex + 1), 1200 / (playRate || 1));
   }
 
   function stopPlayback() {
@@ -3171,22 +3400,52 @@ document.addEventListener("DOMContentLoaded", () => {
   playBtn.addEventListener("click", startPlayback);
   pauseBtn.addEventListener("click", stopPlayback);
 
-  speedBtn.addEventListener("click", () => {
-    if (videoMode) {
-      videoSpeedIdx = (videoSpeedIdx + 1) % VIDEO_SPEEDS.length;
-      const rate = VIDEO_SPEEDS[videoSpeedIdx];
+  // --- Vitesse de lecture : barre de boutons ×0.25 … ×4 (molette et touches - / + aussi)
+  const speedControl = document.getElementById("speed-control");
+  const speedBtns = Array.from(document.querySelectorAll("#speed-control .sc-btn"));
+  const SPEED_RATES = speedBtns.map((b) => Number(b.dataset.rate));
+  let playRate = 1;
+
+  function setPlayRate(rate) {
+    playRate = rate;
+    if (cutoutVideo) {
+      cutoutVideo.defaultPlaybackRate = rate;     // garde la vitesse quand la vidéo change
       cutoutVideo.playbackRate = rate;
-      speedBtn.textContent = `⏱ Speed: ×${rate}`;
-      speedBtn.classList.toggle("fast", rate > 1);
-      return;
     }
-    fastBlink = !fastBlink;
-    speedBtn.textContent = fastBlink ? "⚡ Speed: 3x" : "⏱ Speed: 1x";
-    speedBtn.classList.toggle("fast", fastBlink);
-    if (timerId) {
+    speedBtns.forEach((b) => {
+      const on = Number(b.dataset.rate) === rate;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", String(on));
+    });
+    speedControl?.classList.toggle("fast", rate > 1);
+    speedControl?.classList.toggle("slow", rate < 1);
+    // petit « flash » pour montrer que la vitesse a changé
+    speedControl?.classList.remove("bump");
+    void speedControl?.offsetWidth;
+    speedControl?.classList.add("bump");
+    if (!videoMode && timerId) {                  // ancien mode images : relance au bon rythme
       stopPlayback();
       startPlayback();
     }
+  }
+
+  function stepPlayRate(dir) {
+    const i = SPEED_RATES.indexOf(playRate);
+    const next = SPEED_RATES[Math.min(SPEED_RATES.length - 1, Math.max(0, i + dir))];
+    if (next !== playRate) setPlayRate(next);
+  }
+
+  speedBtns.forEach((b) => b.addEventListener("click", () => setPlayRate(Number(b.dataset.rate))));
+  speedControl?.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    stepPlayRate(e.deltaY < 0 ? 1 : -1);
+  }, { passive: false });
+  document.addEventListener("keydown", (e) => {
+    const tag = (e.target?.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "select" || tag === "textarea") return;
+    if (!frames.length) return;
+    if (e.key === "+" || e.key === "=") stepPlayRate(1);
+    if (e.key === "-" || e.key === "_") stepPlayRate(-1);
   });
 
   slider.addEventListener("input", (e) => {
@@ -3197,7 +3456,9 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keydown", (e) => {
     if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
     if (e.key === "Escape") {
-      if (!compareModalBackdrop.classList.contains("is-closed")) {
+      if (isVideoModalOpen) {
+        closeVideoModal();
+      } else if (!compareModalBackdrop.classList.contains("is-closed")) {
         closeCompareModal();
       } else if (isModalOpen) {
         closeAnimationModal();
@@ -3228,6 +3489,9 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("spherex:coordinatesChanged", (e) => {
     stopPlayback();
     clearVideo();
+    views = [];
+    groupPicker?.classList.add("is-hidden");
+    groupAlertEl?.classList.add("is-hidden");
     const label = e.detail?.label ? ` for ${e.detail.label}` : "";
     bodyEl.classList.add("tl-hidden");
     statusEl.className = "timeline-status loading";
@@ -3235,24 +3499,53 @@ document.addEventListener("DOMContentLoaded", () => {
     statusEl.classList.remove("tl-hidden");
   });
 
-  window.addEventListener("spherex:framesLoaded", (e) => {
+  // --- Vues : « tous les groupes » (par défaut : il faut parfois tous les groupes pour la
+  // vraie trajectoire) ou un seul groupe (même détecteur, λ à ±3 %) choisi par l'utilisateur.
+  let views = [];
+  let lastAlert = null;
+
+  function groupInfoText(view) {
+    if (!view || view.id === "all") {
+      return "Toutes les images, tous détecteurs et longueurs d'onde : trajectoire complète.";
+    }
+    const i = view.info || {};
+    const parts = [`${i.n_images} image(s), ${i.n_passages} passage(s)`];
+    if (i.mu_arcsec_yr != null && i.n_passages >= 2) {
+      parts.push(`mouvement mesuré sur ce groupe seul : ${i.mu_arcsec_yr.toFixed(2)}″/an` +
+        (i.mu_err_arcsec_yr != null ? ` ± ${i.mu_err_arcsec_yr.toFixed(2)}` : "") +
+        (i.position_angle_deg != null ? `, direction ${Math.round(i.position_angle_deg)}° (0 = nord, 90 = est)` : ""));
+    } else {
+      parts.push("un seul passage : pas de mouvement mesurable sur ce groupe seul");
+    }
+    if (i.in_disagreement) parts.push("⚠ en désaccord avec d'autres groupes à un même instant");
+    return parts.join(" · ");
+  }
+
+  function showView(view) {
     stopPlayback();
-    frames = Array.isArray(e.detail?.frames) ? e.detail.frames : [];
-    const vid = e.detail?.video;
+    frames = Array.isArray(view?.frames) ? view.frames : [];
+    const vid = view?.video;
     if (cutoutVideo && vid?.mp4 && frames.some((f) => typeof f.videoTime === "number")) {
       videoMode = true;
       videoInfo = vid;
       if (cutoutImg) cutoutImg.removeAttribute("src");
       if (cutoutVideo.getAttribute("src") !== vid.mp4) cutoutVideo.src = vid.mp4;
-      cutoutVideo.playbackRate = VIDEO_SPEEDS[videoSpeedIdx];
-      speedBtn.textContent = `⏱ Speed: ×${VIDEO_SPEEDS[videoSpeedIdx]}`;
+      cutoutVideo.defaultPlaybackRate = playRate;
+      cutoutVideo.playbackRate = playRate;
     } else {
       clearVideo();
+    }
+    if (groupInfoEl) groupInfoEl.textContent = groupInfoText(view);
+    if (frames[0]?.fov && cutoutFovLabel) {
+      cutoutFovLabel.textContent = `FOV ${frames[0].fov} • WCS-ICRS`;   // taille réellement utilisée
     }
     if (!frames.length) {
       bodyEl.classList.add("tl-hidden");
       statusEl.className = "timeline-status";
-      statusEl.textContent = "No multi-epoch observations found for these coordinates.";
+      // le backend explique pourquoi (objet non détecté, images indisponibles…)
+      statusEl.textContent = lastAlert
+        ? `${lastAlert.title} — ${lastAlert.message}`
+        : "Aucune image SPHEREx exploitable pour cette position.";
       statusEl.classList.remove("tl-hidden");
       return;
     }
@@ -3260,8 +3553,331 @@ document.addEventListener("DOMContentLoaded", () => {
     bodyEl.classList.remove("tl-hidden");
     slider.max = String(frames.length - 1);
     prevBtn.disabled = nextBtn.disabled = playBtn.disabled = pauseBtn.disabled = frames.length <= 1;
+    currentIndex = 0;
     renderDots();
     goToEpoch(0);
+  }
+
+  // Cartes cliquables « Groupe affiché » : nom, longueur d'onde, passages, dates, mouvement.
+  const MOIS_COURT = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.",
+                      "oct.", "nov.", "déc."];
+  const moisAn = (iso) => (iso && iso.length >= 7
+    ? `${MOIS_COURT[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}` : "");
+  const num = (x, nd = 2) => x.toFixed(nd).replace(".", ",");
+
+  function cardContent(v) {
+    if (v.id === "all") {
+      return {
+        title: "Tous les groupes",
+        sub: `Trajectoire complète · ${v.frames.length} image(s)`,
+        badge: "",
+      };
+    }
+    const i = v.info || {};
+    const wl = i.wavelength_um != null ? `${num(i.wavelength_um)} µm` : "";
+    const name = i.number || "Groupe";   // G1, G2… (« D » = détecteur)
+    const mu = i.mu_arcsec_yr != null && i.n_passages >= 2
+      ? `${num(i.mu_arcsec_yr, 1)}${i.mu_err_arcsec_yr != null ? ` ± ${num(i.mu_err_arcsec_yr, 1)}` : ""}″/an`
+      : "";
+    return {
+      title: name,
+      sub: `Détecteur ${i.detector || "?"}${wl ? ` · ${wl}` : ""} · ${i.n_passages} passage(s) · ` +
+           `${moisAn(i.date_start)} → ${moisAn(i.date_end)}`,
+      badge: mu,
+      warn: !!i.in_disagreement,
+    };
+  }
+
+  // Barre de groupes qui défile : flèches ‹ ›, compteur « 2 / 5 », molette = défilement horizontal
+  const groupPrevBtn = document.getElementById("group-prev");
+  const groupNextBtn = document.getElementById("group-next");
+  const groupCountEl = document.getElementById("group-count");
+  let currentViewIdx = 0;
+
+  function updateGroupNav() {
+    if (groupCountEl) groupCountEl.textContent = `${currentViewIdx + 1} / ${Math.max(views.length, 1)}`;
+    if (groupPrevBtn) groupPrevBtn.disabled = currentViewIdx <= 0;
+    if (groupNextBtn) groupNextBtn.disabled = currentViewIdx >= views.length - 1;
+  }
+
+  function revealCard(idx, smooth = true) {
+    const card = groupCardsEl?.children[idx];
+    if (!card || !groupCardsEl) return;
+    // centre la carte choisie dans la barre (sans faire défiler toute la page)
+    const bar = groupCardsEl.getBoundingClientRect();
+    const r = card.getBoundingClientRect();
+    const left = groupCardsEl.scrollLeft + (r.left - bar.left) - (bar.width - r.width) / 2;
+    groupCardsEl.scrollTo({ left: Math.max(0, left), behavior: smooth ? "smooth" : "auto" });
+  }
+
+  function selectView(idx) {
+    const v = views[idx];
+    if (!v) return;
+    currentViewIdx = idx;
+    if (groupSelect) groupSelect.value = String(idx);
+    groupCardsEl?.querySelectorAll(".group-card").forEach((c, j) => {
+      c.classList.toggle("active", j === idx);
+      c.setAttribute("aria-selected", String(j === idx));
+    });
+    updateGroupNav();
+    revealCard(idx);
+    showView(v);
+  }
+
+  groupPrevBtn?.addEventListener("click", () => selectView(currentViewIdx - 1));
+  groupNextBtn?.addEventListener("click", () => selectView(currentViewIdx + 1));
+  // la molette (verticale) fait défiler la barre horizontalement
+  groupCardsEl?.addEventListener("wheel", (e) => {
+    if (groupCardsEl.scrollWidth <= groupCardsEl.clientWidth) return;
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      groupCardsEl.scrollLeft += e.deltaY;
+      e.preventDefault();
+    }
+  }, { passive: false });
+  // flèches du clavier quand la barre a le focus
+  groupCardsEl?.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") { selectView(Math.min(currentViewIdx + 1, views.length - 1)); e.preventDefault(); }
+    if (e.key === "ArrowLeft") { selectView(Math.max(currentViewIdx - 1, 0)); e.preventDefault(); }
+  });
+
+  function fillGroupPicker() {
+    if (!groupPicker) return;
+    if (groupSelect) {
+      groupSelect.innerHTML = "";
+      views.forEach((v, i) => {
+        const opt = document.createElement("option");
+        opt.value = String(i);
+        groupSelect.appendChild(opt);
+      });
+    }
+    if (groupCardsEl) {
+      groupCardsEl.innerHTML = "";
+      views.forEach((v, i) => {
+        const c = cardContent(v);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "group-card" + (i === 0 ? " active all" : "") + (c.warn ? " warn" : "");
+        btn.setAttribute("role", "option");
+        btn.setAttribute("aria-selected", String(i === 0));
+        btn.innerHTML =
+          `<span class="gc-main"><span class="gc-title"></span><span class="gc-sub"></span></span>` +
+          `<span class="gc-badge"></span>`;
+        btn.querySelector(".gc-title").textContent = (c.warn ? "⚠ " : "") + c.title;
+        btn.querySelector(".gc-sub").textContent = c.sub;
+        btn.querySelector(".gc-badge").textContent = c.badge;
+        btn.addEventListener("click", () => selectView(i));
+        groupCardsEl.appendChild(btn);
+      });
+    }
+    groupPicker.classList.toggle("is-hidden", views.length <= 1);
+    currentViewIdx = 0;
+    updateGroupNav();
+    if (groupCardsEl) groupCardsEl.scrollLeft = 0;
+  }
+
+  groupSelect?.addEventListener("change", () => selectView(Number(groupSelect.value)));
+
+  function showGroupAlert(alert) {
+    if (!groupAlertEl) return;
+    // affiché seulement quand il y a quelque chose à savoir (pas pour « tout concorde »)
+    if (!alert || alert.level === "ok") {
+      groupAlertEl.classList.add("is-hidden");
+      return;
+    }
+    groupAlertEl.className = `group-alert ${alert.level}`;
+    groupAlertEl.querySelector(".ga-title").textContent =
+      (alert.level === "warn" ? "⚠ " : "ℹ ") + alert.title;
+    groupAlertEl.querySelector(".ga-msg").textContent = alert.message;
+  }
+
+  // --- Fenêtre « Vidéo SPHEREx » (clic sur l'objet) : on y DÉPLACE la vidéo, la frise,
+  // le choix du groupe et le message ; à la fermeture, ils reviennent à leur place.
+  // Mêmes éléments -> même état (date, vitesse, groupe, lecture).
+  const videoModalBackdrop = document.getElementById("video-modal-backdrop");
+  const videoModalMain = document.getElementById("video-modal-main");
+  const videoModalSide = document.getElementById("video-modal-side");
+  const videoModalTitle = document.getElementById("video-modal-title");
+  const closeVideoModalBtn = document.getElementById("close-video-modal");
+  let isVideoModalOpen = false;
+  let movedBack = [];
+
+  function moveKeepingPlayback(moves) {
+    const wasPlaying = videoMode && cutoutVideo && !cutoutVideo.paused && !cutoutVideo.ended;
+    const t = cutoutVideo ? cutoutVideo.currentTime : 0;
+    moves();
+    if (cutoutVideo && videoMode) {
+      if (Math.abs(cutoutVideo.currentTime - t) > 0.05) cutoutVideo.currentTime = t;
+      if (wasPlaying) cutoutVideo.play().catch(() => {});
+    }
+    requestAnimationFrame(drawMarkers);
+  }
+
+  function openVideoModal(target) {
+    if (!videoModalBackdrop) return;
+    if (target && selectedTarget?.id !== target.id) selectAndZoomToTarget(target);
+    const t = target || selectedTarget;
+    if (videoModalTitle) {
+      videoModalTitle.textContent = `${t?.shortName || t?.name || "Cible"} — vidéo SPHEREx`;
+    }
+    if (isVideoModalOpen) return;
+    const stage = document.querySelector(".cutout-media-stage");
+    const dock = document.getElementById("timeline-dock");
+    const parts = [
+      [stage, videoModalMain],
+      [dock, videoModalMain],
+      [groupPicker, videoModalSide],
+      [epochNoteEl, videoModalSide],
+      [groupAlertEl, videoModalSide],
+    ].filter(([el]) => el);
+    moveKeepingPlayback(() => {
+      movedBack = parts.map(([el, dest]) => {
+        const ph = document.createComment("place");
+        el.before(ph);
+        dest.appendChild(el);
+        return [el, ph];
+      });
+    });
+    isVideoModalOpen = true;
+    videoModalBackdrop.classList.remove("is-closed");
+    requestAnimationFrame(() => revealCard(currentViewIdx, false));   // la barre a changé de largeur
+  }
+
+  function closeVideoModal() {
+    if (!isVideoModalOpen) return;
+    moveKeepingPlayback(() => {
+      movedBack.forEach(([el, ph]) => ph.replaceWith(el));
+      movedBack = [];
+    });
+    isVideoModalOpen = false;
+    videoModalBackdrop.classList.add("is-closed");
+    requestAnimationFrame(() => revealCard(currentViewIdx, false));
+  }
+
+  closeVideoModalBtn?.addEventListener("click", closeVideoModal);
+  videoModalBackdrop?.addEventListener("click", (e) => {
+    if (e.target === videoModalBackdrop) closeVideoModal();
+  });
+
+  // =========================================================
+  // Fraîcheur des données SPHEREx : le serveur revérifie IRSA chaque semaine et intègre
+  // les nouvelles images en arrière-plan ; ici on l'affiche et on propose la nouvelle vidéo
+  // =========================================================
+  const freshEl = document.getElementById("data-freshness");
+  const freshText = freshEl?.querySelector(".df-text");
+  const toastEl = document.getElementById("data-update-toast");
+  const toastText = toastEl?.querySelector(".dut-text");
+  const toastShowBtn = document.getElementById("data-update-show");
+  let shownData = null;          // résultat affiché : { key, computedAt, targetId, label }
+  let freshTimer = null;
+
+  const frDay = (iso) => {
+    if (!iso) return "—";
+    const d = new Date(iso.length <= 10 ? `${iso}T00:00:00Z` : iso);
+    return Number.isNaN(d.getTime())
+      ? iso
+      : d.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
+  };
+
+  function sinceText(iso) {
+    const t = iso ? Date.parse(iso) : NaN;
+    if (Number.isNaN(t)) return "";
+    const h = (Date.now() - t) / 3.6e6;
+    if (h < 1) return "à l'instant";
+    if (h < 24) return `il y a ${Math.round(h)} h`;
+    const d = Math.round(h / 24);
+    return d === 1 ? "hier" : `il y a ${d} jours`;
+  }
+
+  function renderFreshness(u) {
+    if (!freshEl || !freshText) return;
+    if (!u) {
+      freshEl.classList.add("is-hidden");
+      return;
+    }
+    const st = u.status;
+    const imgs = u.n_images_found != null
+      ? `${u.n_images_found} images SPHEREx` +
+        (u.last_image_date ? ` · la plus récente : ${frDay(u.last_image_date)}` : "")
+      : "";
+    let text;
+    if (st === "updating") {
+      text = "Recherche de nouvelles images SPHEREx sur IRSA… (la vidéo actuelle reste affichée)";
+    } else {
+      const out = u.last_outcome?.outcome;
+      const checked = out === "no-new-images" && sinceText(u.checked_at) === "à l'instant"
+        ? "vérifié à l'instant : aucune nouvelle image"
+        : `vérifié ${sinceText(u.checked_at)}`;
+      const next = st === "off"
+        ? "mise à jour automatique désactivée"
+        : u.next_check_at
+          ? `prochaine vérification : ${frDay(u.next_check_at)}`
+          : "";
+      text = [imgs, checked, next].filter(Boolean).join(" · ");
+      if (out === "irsa-unavailable") text += " · IRSA indisponible, nouvel essai plus tard";
+    }
+    freshText.textContent = text;
+    freshEl.classList.toggle("updating", st === "updating");
+    freshEl.classList.remove("is-hidden");
+  }
+
+  function scheduleFreshPoll(ms) {
+    clearTimeout(freshTimer);
+    freshTimer = setTimeout(pollUpdates, ms);
+  }
+
+  async function pollUpdates() {
+    let next = 5 * 60 * 1000;                    // toutes les 5 min
+    try {
+      if (shownData?.key && window.ObservationsApi?.fetchUpdateStatus && !document.hidden) {
+        const st = await window.ObservationsApi.fetchUpdateStatus();
+        const row = (st.results || []).find((r) => r.key === shownData.key);
+        if (row) {
+          if (row.status === "updating") next = 20 * 1000;   // suivi rapproché pendant la recherche
+          if (row.computed_at && shownData.computedAt && row.computed_at !== shownData.computedAt) {
+            const n = row.last_outcome?.new_images;
+            toastText.textContent =
+              `Nouvelles images SPHEREx pour ${shownData.label}` + (n ? ` (+${n})` : "") +
+              " : la vidéo a été mise à jour.";
+            toastEl.classList.remove("is-hidden");
+          }
+          renderFreshness(row);
+        }
+      }
+    } catch (_) {
+      /* serveur momentanément injoignable : on réessaiera */
+    }
+    scheduleFreshPoll(next);
+  }
+
+  toastShowBtn?.addEventListener("click", () => {
+    toastEl.classList.add("is-hidden");
+    if (selectedTarget && selectedTarget.id === shownData?.targetId) loadObservations(selectedTarget);
+  });
+
+  window.addEventListener("spherex:framesLoaded", (e) => {
+    const u = e.detail?.update || null;
+    shownData = e.detail?.resultKey
+      ? {
+          key: e.detail.resultKey,
+          computedAt: u?.computed_at || null,
+          targetId: e.detail.targetId,
+          label: selectedTarget?.shortName || selectedTarget?.name || "cette cible",
+        }
+      : null;
+    toastEl?.classList.add("is-hidden");
+    renderFreshness(u);
+    scheduleFreshPoll(u?.status === "updating" ? 15 * 1000 : 5 * 60 * 1000);
+  });
+
+  window.addEventListener("spherex:framesLoaded", (e) => {
+    lastAlert = e.detail?.alert || null;
+    showGroupAlert(e.detail?.alert);
+    const given = Array.isArray(e.detail?.views) ? e.detail.views : [];
+    views = given.length
+      ? given
+      : [{ id: "all", frames: e.detail?.frames || [], video: e.detail?.video || null }];
+    fillGroupPicker();
+    showView(views[0]);                  // par défaut : tous les groupes
   });
 
   window.addEventListener("spherex:framesError", (e) => {
@@ -3295,6 +3911,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
     const initRa = params.get("ra");
     const initDec = params.get("dec");
+    if (initRa === null || initDec === null) startIntro();
     if (initRa !== null && initDec !== null) {
       raInput.value = initRa;
       decInput.value = initDec;
