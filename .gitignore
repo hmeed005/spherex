@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Cache des données SPHEREx (cutouts FITS, vidéos, résultats) : régénérable, volumineux
+backend/cache/
+cache/
+
+# Divers
+*.part
+.vscode/
+.DS_Store
+Thumbs.db
+*.zip
