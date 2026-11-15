@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pydantic>=2
+astropy
+astroquery>=0.4.10
+numpy
+matplotlib
+pillow
+imageio-ffmpeg
+httpx
+pytest

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>SPHEREx — lecteur de trajectoire (démo backend)</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; background: #0f1117; color: #e6e6e6; }
+  header { padding: 14px 20px; background: #161a23; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  header input { padding: 6px 8px; border-radius: 6px; border: 1px solid #333; background: #0f1117; color: #eee; }
+  header button { padding: 6px 12px; border-radius: 6px; border: 0; background: #3b82f6; color: white; cursor: pointer; }
+  main { max-width: 980px; margin: 0 auto; padding: 16px; }
+  .result { font-size: 15px; margin: 8px 0 14px; }
+  .warn { background: #3a2a10; border: 1px solid #b35900; padding: 10px; border-radius: 8px; margin-bottom: 12px; }
+  video { width: 100%; max-width: 640px; display: block; margin: 0 auto; border-radius: 8px; background: #000; }
+  .slider { display: flex; align-items: center; gap: 10px; max-width: 640px; margin: 12px auto; }
+  .slider input { flex: 1; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin-top: 10px; }
+  .card { background: #161a23; border: 2px solid transparent; border-radius: 8px; padding: 8px; cursor: pointer; font-size: 12px; }
+  .card.active { border-color: #00e5ff; background: #102029; }
+  .card b { font-size: 13px; }
+  .detail { background: #161a23; border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 14px; line-height: 1.5; }
+  .note-ok { color: #4ade80; } .note-warn { color: #fbbf24; }
+  h2 { font-size: 16px; margin-top: 26px; }
+  .sbs img { max-width: 100%; border-radius: 6px; margin: 6px 0; }
+  .muted { color: #999; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <b>SPHEREx — trajectoire</b>
+  <input id="name" value="Barnard" size="16">
+  <button id="go">Charger</button>
+  <span id="status" class="muted"></span>
+</header>
+<main>
+  <div id="result" class="result"></div>
+  <div id="warn"></div>
+  <div id="sequences"></div>
+  <h2 id="sbsTitle" style="display:none">Comparaisons côte à côte (désaccords)</h2>
+  <div id="sbs" class="sbs"></div>
+</main>
+<script>
+// Démo de synchronisation vidéo <-> détails, à partir de GET /api/motion.
+// Le frontend n'a AUCUN calcul de temps à faire : chaque entrée de la frise donne
+// t_start_s / t_end_s (pour savoir quelle date est affichée) et seek_s (pour y aller).
+const $ = id => document.getElementById(id);
+
+function seqBlock(seq, si) {
+  const v = seq.video, wrap = document.createElement("div");
+  const title = seq.kind === "unique" ? "Trajectoire (une seule vidéo, ordre chronologique)"
+              : seq.kind === "principale" ? "Séquence principale (groupes concordants)"
+              : `⚠ Groupe séparé : ${seq.groups.join(", ")}`;
+  wrap.innerHTML = `<h2>${title}</h2>`;
+  if (!v) { wrap.innerHTML += `<p class="muted">Pas de vidéo pour cette séquence.</p>`; return wrap; }
+  const src = v.mp4 || v.gif;
+  const isMp4 = !!v.mp4;
+  // vidéo PROPRE (uniquement le ciel) ; tous les paramètres sont dans la case en dessous
+  wrap.innerHTML += isMp4
+    ? `<video id="vid${si}" src="${src}" controls loop muted playsinline preload="auto"></video>
+       <div style="text-align:center;margin-top:8px" class="muted">vitesse :
+         ${[0.25, 0.5, 1, 1.5, 2, 4].map(r => `<button class="spd${si}" data-r="${r}"
+            style="margin:0 2px;padding:3px 8px;border-radius:5px;border:1px solid #444;
+            background:${r === 1 ? "#3b82f6" : "#1f2430"};color:#eee;cursor:pointer">×${r}</button>`).join("")}
+       </div>
+       ${v.mp4_markers ? `<div style="text-align:center;margin-top:6px">
+         <label class="muted"><input type="checkbox" id="mk${si}"> afficher les repères
+         (positions mesurées, trajectoire)</label></div>` : ""}`
+    : `<img src="${src}" style="max-width:640px;width:100%">`;
+  const tl = v.timeline;
+  wrap.innerHTML += `
+    <div class="slider"><span class="muted">Date</span>
+      <input id="rng${si}" type="range" min="0" max="${tl.length - 1}" step="1" value="0">
+      <span id="lbl${si}" class="muted"></span></div>
+    <div id="detail${si}" class="detail"></div>
+    <div id="cards${si}" class="cards"></div>`;
+  tl.cleanSrc = v.mp4; tl.markersSrc = v.mp4_markers;
+  setTimeout(() => wire(si, tl, isMp4), 0);
+  return wrap;
+}
+
+function wire(si, tl, isMp4) {
+  const vid = $("vid" + si), rng = $("rng" + si), cards = $("cards" + si);
+  tl.forEach((e, k) => {
+    const c = document.createElement("div");
+    c.className = "card"; c.id = `card${si}_${k}`;
+    c.innerHTML = `<b>${e.date_utc.slice(0, 10)}</b>${e.disagreement ? " ⚠" : ""}<br>${e.detector || ""} · λ ${e.wavelength_um?.toFixed(3)} µm
+                   <br><span style="color:${e.disagreement ? "#fbbf24" : "#999"}">${e.group_changed ? "🔁 " : ""}${e.segment_label || e.group}</span>`;
+    c.onclick = () => goTo(k);                       // détails -> vidéo
+    cards.appendChild(c);
+  });
+  function show(k) {
+    const e = tl[k];
+    rng.value = k; $("lbl" + si).textContent = e.date_utc.slice(0, 10);
+    tl.forEach((_, j) => $(`card${si}_${j}`).classList.toggle("active", j === k));
+    const note = e.note ? `<div class="${e.note.includes("⚠") || e.note.includes("non vérifiable") ? "note-warn" : "note-ok"}">${e.note}</div>` : "";
+    const chg = e.wavelength_change ? `<div class="note-warn">${e.wavelength_change}</div>` : "";
+    const mp = e.target_measured_px, pp = e.target_predicted_px;
+    $("detail" + si).innerHTML = `
+      <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:15px;margin-bottom:6px">
+        <span>📅 <b>${e.date_utc.replace("T", " ").slice(0, 16)} UTC</b></span>
+        <span>🌈 λ = <b>${e.wavelength_um} µm</b></span>
+        <span>🔭 détecteur <b>${e.detector}</b></span>
+        <span>image <b>${k + 1}/${tl.length}</b></span></div>
+      bloc <b style="color:${e.disagreement ? "#fbbf24" : "#7dd3fc"}">${e.segment_label || e.group}</b>
+      <span class="muted">(image du groupe ${e.group})</span>
+      ${e.group_changed ? `<div class="note-warn">🔁 changement de groupe : ${e.previous_group} → ${e.segment_label}</div>` : ""}
+      qualité : ${e.status}, S/N ${e.snr} · ${e.used_in_fit ? "utilisée dans l'ajustement" : "écartée de l'ajustement"}<br>
+      position mesurée (brute) : (${mp?.[0].toFixed(2)}, ${mp?.[1].toFixed(2)}) px
+      ${pp ? ` · prédite : (${pp[0].toFixed(2)}, ${pp[1].toFixed(2)}) px` : ""}
+      ${note}${chg}
+      <div class="muted"><a style="color:#7dd3fc" href="${e.image_url}" target="_blank">image fixe de cette date</a></div>`;
+  }
+  function current(t) { let k = 0; tl.forEach((e, j) => { if (t >= e.t_start_s) k = j; }); return k; }
+  function goTo(k) {
+    if (isMp4) { vid.currentTime = tl[k].seek_s; vid.pause(); }
+    show(k);
+  }
+  rng.oninput = () => goTo(+rng.value);              // curseur -> vidéo
+  const mk = $("mk" + si);                           // bascule propre <-> repères, même instant
+  if (mk && isMp4) mk.onchange = () => {
+    const t = vid.currentTime, playing = !vid.paused, rate = vid.playbackRate;
+    vid.src = mk.checked ? tl.markersSrc : tl.cleanSrc;
+    vid.onloadedmetadata = () => { vid.currentTime = t; vid.playbackRate = rate; if (playing) vid.play(); };
+  };
+  // vidéo -> détails : vérifié à chaque image de l'écran (~60 fois/s), et pas seulement
+  // aux événements "timeupdate" (~4 fois/s) : la case suit même en vitesse accélérée.
+  // La frise est en temps VIDÉO, donc elle reste juste quelle que soit la vitesse.
+  if (isMp4) {
+    const sync = () => { const k = current(vid.currentTime); if (+rng.value !== k) show(k); };
+    // ~60 fois/s quand la page est visible (fluide, même en ×4)...
+    const tick = () => { sync(); requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+    // ...et en secours via les événements de la vidéo (requestAnimationFrame est mis en
+    // pause par le navigateur quand la page n'est pas visible)
+    vid.addEventListener("timeupdate", sync);
+    vid.addEventListener("seeked", sync);
+    document.querySelectorAll(".spd" + si).forEach(b => b.onclick = () => {
+      vid.playbackRate = +b.dataset.r;                 // changer la vitesse
+      document.querySelectorAll(".spd" + si).forEach(x => x.style.background = "#1f2430");
+      b.style.background = "#3b82f6";
+    });
+    vid.onratechange = () => document.querySelectorAll(".spd" + si).forEach(x =>
+      x.style.background = (+x.dataset.r === vid.playbackRate) ? "#3b82f6" : "#1f2430");
+  }
+  show(0);
+}
+
+async function load() {
+  const name = $("name").value.trim();
+  $("status").textContent = "calcul en cours (peut prendre plusieurs minutes la 1re fois)…";
+  $("sequences").innerHTML = $("sbs").innerHTML = $("warn").innerHTML = $("result").innerHTML = "";
+  const r = await fetch(`/api/motion?name=${encodeURIComponent(name)}`);
+  if (!r.ok) { $("status").textContent = `Erreur ${r.status} : ${await r.text()}`; return; }
+  const d = await r.json(); $("status").textContent = "";
+  const m = d.motion, m0 = d.motion_without_offsets;
+  $("result").innerHTML = m.mu_arcsec_yr != null
+    ? `<b>${d.target_label}</b> — μ = ${m.mu_arcsec_yr} ± ${m.mu_err_arcsec_yr} "/an, angle ${m.position_angle_deg}°,
+       statut <b>${m.status}</b> (${m.status_reason})<br>
+       <span class="muted">sans correction des décalages : ${m0.mu_arcsec_yr} ± ${m0.mu_err_arcsec_yr} "/an ·
+       ${m.n_distinct_epochs} dates, ${m.coverage_start} → ${m.coverage_end} ·
+       <a style="color:#7dd3fc" href="${d.positions_plot_url}" target="_blank">positions brutes</a></span>`
+    : `<b>${d.target_label}</b> — statut ${m.status} (${m.status_reason})`;
+  if (d.display.conflicted_groups.length)
+    $("warn").innerHTML = `<div class="warn">⚠ ${d.display.summary}. Jugez vous-même ci-dessous.</div>`;
+  d.display.sequences.forEach((s, i) => $("sequences").appendChild(seqBlock(s, i)));
+  if (d.side_by_side_urls.length) {
+    $("sbsTitle").style.display = "block";
+    d.side_by_side_urls.forEach(u => $("sbs").innerHTML += `<img src="${u}">`);
+  }
+}
+$("go").onclick = load;
+const q = new URLSearchParams(location.search).get("name");
+if (q) { $("name").value = q; load(); }
+</script>
+</body>
+</html>
